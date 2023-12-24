@@ -4,6 +4,6 @@
     "goal": "package -Pprod -DskipTests"
   },
   "deploy": {
-    "goal": "-Dtest.active=false package exec:java"
+    "goal": "spring-boot:run"
   }
 }
