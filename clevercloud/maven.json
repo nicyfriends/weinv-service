@@ -1,7 +1,7 @@
 {
   "build": {
     "type": "maven",
-    "goal": "-Pprod package -DskipTests"
+    "goal": "package -Pprod -DskipTests"
   },
   "deploy": {
     "goal": "package -Pprod -DskipTests"
