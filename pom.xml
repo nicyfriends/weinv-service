@@ -243,7 +243,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>wedding-invitation-${version}</finalName>
+		<finalName>wedding-invitation-${project.version}</finalName>
 	</build>
 
 </project>
