@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOGGING_DIR" value="/logs/weinv/weinv-server"/>
+    <property name="LOGGING_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %n"/>
+    <property name="LOGGING_FILE_MAX_SIZE" value="1MB"/>
+    <property name="LOGGING_MAX_HISTORY" value="365"/>
+    <property name="LOGGING_TOTAL_SIZE_CAP" value="1GB"/>
+
+    <!-- appender console -->
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>${LOGGING_PATTERN}</Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+    </appender>
+
+    <!-- logging API -->
+    <appender name="apiAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGGING_DIR}/api.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOGGING_DIR}/api-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>${LOGGING_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOGGING_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${LOGGING_TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${LOGGING_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+    <logger name="com.mainthreadlab.weinv.controller" additivity="true">
+        <level value="DEBUG"/>
+        <appender-ref ref="apiAppender"/>
+    </logger>
+
+    <!-- logging lifecycle (startup/shutdown) -->
+    <appender name="lifecycleAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGGING_DIR}/lifecycle.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOGGING_DIR}/lifecycle-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>${LOGGING_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOGGING_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${LOGGING_TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${LOGGING_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+    <logger name="com.mainthreadlab.weinv.StartupShutdownEventListener" additivity="true">
+        <level value="INFO" />
+        <appender-ref ref="lifecycleAppender" />
+        <appender-ref ref="consoleAppender" />
+    </logger>
+
+    <!-- logger hibernate -->
+    <appender name="hibernateAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGGING_DIR}/hibernate.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOGGING_DIR}/hibernate-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>${LOGGING_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOGGING_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${LOGGING_TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${LOGGING_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.hibernate.SQL" level="info" additivity="false">
+        <appender-ref ref="hibernateAppender"/>
+    </logger>
+
+    <logger name="org.hibernate.type.descriptor.sql" level="info">
+        <appender-ref ref="hibernateAppender"/>
+    </logger>
+
+    <!-- logger all -->
+    <appender name="allAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGGING_DIR}/all.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOGGING_DIR}/all-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>${LOGGING_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOGGING_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${LOGGING_TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${LOGGING_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+    <logger name="com.mainthreadlab" additivity="true">
+        <level value="INFO"/>
+        <appender-ref ref="allAppender"/>
+    </logger>
+
+    <!-- logger spring -->
+    <appender name="springAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGGING_DIR}/spring.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOGGING_DIR}/spring-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>${LOGGING_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOGGING_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${LOGGING_TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${LOGGING_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+    <logger name="org.springframework" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="springAppender"/>
+    </logger>
+
+    <!-- logging di root -->
+    <appender name="rootAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGGING_DIR}/root.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOGGING_DIR}/root-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>${LOGGING_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOGGING_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>${LOGGING_TOTAL_SIZE_CAP}</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${LOGGING_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="rootAppender"/>
+    </root>
+
+    <logger name="org.springframework.boot.context.web.ErrorPageFilter">
+        <level value="OFF"/>
+    </logger>
+
+    <logger name="com.mainthreadlab.weinv.handler" additivity="true">
+        <level value="DEBUG"/>
+        <appender-ref ref="apiAppender"/>
+    </logger>
+
+    <logger name="com.mainthreadlab.weinv.service" additivity="true">
+        <level value="DEBUG"/>
+        <appender-ref ref="apiAppender"/>
+    </logger>
+
+    <logger name="org.hibernate.SQL" level="trace" additivity="false">
+        <appender-ref ref="apiAppender"/>
+    </logger>
+
+    <logger name="org.hibernate.type.descriptor.sql" level="trace">
+        <appender-ref ref="apiAppender"/>
+    </logger>
+
+</configuration>

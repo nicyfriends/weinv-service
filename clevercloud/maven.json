@@ -1,0 +1,9 @@
+{
+  "build": {
+    "type": "maven",
+    "goal": "-Pprod package -DskipTests"
+  },
+  "deploy": {
+    "jarName": "./target/wedding-invitation-1.0.jar"
+  }
+}

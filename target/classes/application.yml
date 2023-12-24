@@ -1,0 +1,160 @@
+server:
+  tomcat.accesslog.enabled: true
+  port: ${PORT:8888}
+  servlet:
+    context-path: /weinv
+
+security:
+  jwt:
+    key-store: classpath:purchase-order-jwt.jks
+    key-store-password: purchase-order-pass
+    key-pair-alias: purchase-order-oauth-jwt
+    jwk-kid: purchase-order-key-id
+    key-pair-password: purchase-order-pass
+
+  oauth2:
+    resource:
+      jwk:
+        # Tells the JWK framework to fetch keys from the authorization server during startup
+        # Note: The authorization server needs to be running...
+        #key-set-uri: http://localhost:8888/weinv/.well-known/jwks.json
+        ### render.com ####
+        #key-set-uri: https://weinv-services.onrender.com/weinv/.well-known/jwks.json
+        ### clever-cloud.com ####
+        key-set-uri: https://weinv-service.cleverapps.io/weinv/.well-known/jwks.json
+
+spring:
+  application:
+    name: weinv
+
+  output:
+    ansi.enabled: always
+
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+
+  datasource:
+    #url: jdbc:postgresql://localhost:5432/weinv
+    #username: postgres
+    #password: admin
+
+#    ### RENDER.COM ###
+#    url: jdbc:postgresql://dpg-cigq6nt9aq012ep11gn0-a.frankfurt-postgres.render.com:5432/weinv_db
+#    username: weinv_db_user
+#    password: 23ItYFHtktZylnAJKNYYIt1pNCUamT1R
+
+    ### SCALINGO ###
+#    url: jdbc:postgresql://127.0.0.200:5432/vyhanomy_weinv
+#    username: weinv_user
+#    password: 23ItYFHtktZylnAJKNYYIt1pNCUamT1R
+
+    ### CLEVER_CLOUD.COM ###
+    url: jdbc:postgresql://b9fqmyg1ebhpygfehw6f-postgresql.services.clever-cloud.com:50013/b9fqmyg1ebhpygfehw6f
+    username: udkei9weu4ffsegogyzd
+    password: Dmi3QxrFMQpQvZ3hHLSqYh84ZCg5GI
+
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5   # for clever-cloud (free version: max 5 connectionns)
+
+  jpa:
+    generate-ddl: false #true
+    hibernate:
+      ddl-auto: none #update #create
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+
+
+    properties:
+      hibernate:
+        #globally_quoted_identifiers: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        #show-sql: true
+        #format_sql: true
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "nicy.lab.noreply@gmail.com"
+    password: "jlow yowx kfto pxzm"
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls.enable: true
+          connectiontimeout: 20000
+          timeout: 20000
+          writetimeout: 20000
+        debug: true
+
+springdoc:
+  packagesToScan: com.mainthreadlab.weinv
+#  swagger-ui:
+#    path:
+#      /weinv/swagger-ui.html
+
+weinv:
+  contact: "threadnicy@gmail.com"
+
+  job:
+    delete:
+      weddings:
+        size: "10"
+        deletionCronExpression: 0 0/5 * * * ? #0 0/10 * * * ?: 10min #0 0/1 * * * ?: every minute; 0 0 1 * * ?: every day at 1am
+
+  openapi:
+    title: "Weinv"
+    version: "v3"
+    description: "weinv-services"
+
+  auth-server:
+    #login: "http://localhost:8888/weinv/oauth/token"
+    #users: "http://localhost:8888/weinv/users"
+    #clients: "http://localhost:8888/weinv/clients"
+    ### render ###
+    #login: "https://weinv-services.onrender.com/weinv/oauth/token"
+    #users: "https://weinv-services.onrender.com/weinv/users"
+    #clients: "https://weinv-services.onrender.com/weinv/clients"
+    ### clever-cloud ###
+    login: "https://weinv-service.cleverapps.io/weinv/oauth/token"
+    users: "https://weinv-service.cleverapps.io/weinv/users"
+    clients: "https://weinv-service.cleverapps.io/weinv/clients"
+
+  client-id: "weinv"
+  client-secret: "WEINV.ClientSecret1@"
+
+  httpClient:
+    timeout: 20000
+
+  cipher:
+    transformation-algorithm: "RSA/ECB/PKCS1Padding"
+
+  ui:
+    #login-uri: "http://localhost:3000/signin"
+    ### netlify ###
+    #login-uri: "https://weinv.netlify.app/signin"
+    ### clever-cloud ###
+    login-uri: "https://weinv.it/signin"
+    default:
+      invitation-other-text:
+        en: /templates/en/default_invitation_other_text.txt
+        fr: /templates/fr/default_invitation_other_text.txt
+
+  mail:
+    account:
+      wedding-responsible:
+        subject: "WEINV account created"
+        body:
+          en: /templates/en/account_created.html
+          fr: /templates/fr/account_created.html
+    events:
+      wedding:
+        subject: "WEINV wedding invitation"
+        body:
+          en: /templates/en/mail_invitation.html
+          fr: /templates/fr/mail_invitation.html
