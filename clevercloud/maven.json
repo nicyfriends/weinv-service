@@ -4,6 +4,6 @@
     "goal": "package -Pprod -DskipTests"
   },
   "deploy": {
-    "goal": "-Dtest.active=false -Dexec.mainClass=\"com.mainthreadlab.weinv.WeinvApplication\" package exec:java"
+    "goal": "-Dtest.active=false -Dexec.mainClass=\"com\"mainthreadlab\"weinv\"WeinvApplication\" package exec:java"
   }
 }
