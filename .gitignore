@@ -1,6 +1,6 @@
 HELP.md
 #because render.com needs this directory
-#target/
+target/
 #!.mvn/wrapper/maven-wrapper.jar
 #!**/src/main/**/target/
 #!**/src/test/**/target/
