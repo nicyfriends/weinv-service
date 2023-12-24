@@ -1,6 +1,6 @@
 server:
   tomcat.accesslog.enabled: true
-  port: 8888
+  port: 8080
   servlet:
     context-path: /weinv
 
