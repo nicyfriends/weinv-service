@@ -3,10 +3,6 @@ package com.mainthreadlab.weinv.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.mainthreadlab.weinv.repository.UserRepository;
-import com.mainthreadlab.weinv.repository.WeddingGuestRepository;
-import com.mainthreadlab.weinv.repository.WeddingRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -20,12 +16,6 @@ import java.util.Properties;
 @Configuration
 public class WeinvConfiguration {
 
-    @Autowired
-    WeddingRepository weddingRepository;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    WeddingGuestRepository weddingGuestRepository;
 
     @Value("${weinv.httpClient.timeout}")
     private int httpClientTimeout;
@@ -66,7 +56,7 @@ public class WeinvConfiguration {
     public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder
                 //.setConnectTimeout(Duration.ofSeconds(httpClientTimeout))
-              //  .setReadTimeout(Duration.ofSeconds(httpClientTimeout))
+                //  .setReadTimeout(Duration.ofSeconds(httpClientTimeout))
                 .build();
     }
 

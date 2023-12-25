@@ -13,11 +13,6 @@ import java.util.List;
 @Repository
 public interface WeddingGuestRepository extends JpaRepository<WeddingGuest, WeddingGuestId>, JpaSpecificationExecutor<WeddingGuest> {
 
-    List<WeddingGuest> findByWeddingAndConfirmedTrue(Wedding wedding);
-
-    List<WeddingGuest> findByWeddingAndConfirmedFalse(Wedding wedding);
-
-    WeddingGuest findByWeddingAndTableNumber(Wedding wedding, String tableNumber);
 
     List<WeddingGuest> findByWedding(Wedding wedding);
 

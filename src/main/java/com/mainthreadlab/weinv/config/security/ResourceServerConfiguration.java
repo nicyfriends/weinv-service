@@ -1,6 +1,5 @@
 package com.mainthreadlab.weinv.config.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,17 +24,17 @@ import java.util.Collections;
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
     private static final String RESOURCE_ID = "WEDDING-INVITATION";
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final AccessDeniedHandler accessDeniedHandler;
+    private final String contextPath;
 
-    @Autowired
-    @Qualifier("customAuthenticationEntryPoint")
-    private AuthenticationEntryPoint authenticationEntryPoint;
-
-    @Autowired
-    @Qualifier("customAccessDeniedHandler")
-    private AccessDeniedHandler accessDeniedHandler;
-
-    @Value("${server.servlet.context-path}")
-    private String contextPath;
+    public ResourceServerConfiguration(@Qualifier("customAuthenticationEntryPoint") AuthenticationEntryPoint authenticationEntryPoint,
+                                       @Qualifier("customAccessDeniedHandler") AccessDeniedHandler accessDeniedHandler,
+                                       @Value("${server.servlet.context-path}") String contextPath) {
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
+        this.contextPath = contextPath;
+    }
 
 
     @Override
@@ -64,7 +63,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 // Our public endpoints
                 //.antMatchers("/auth/**").permitAll()
                 // Our private endpoints
-                .antMatchers("/users/register").access("hasAuthority('admin')")
+                .antMatchers("/users/register").access("hasAnyAuthority('admin','user')")
                 .antMatchers("/confirm").access("hasAuthority('guest')")
                 .antMatchers(HttpMethod.POST, contextPath).access("hasAnyAuthority('admin','user')")
                 .antMatchers(HttpMethod.PATCH, contextPath).access("hasAnyAuthority('admin','user')")

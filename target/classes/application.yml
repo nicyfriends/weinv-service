@@ -1,6 +1,6 @@
 server:
   tomcat.accesslog.enabled: true
-  port: ${PORT:8888}
+  port: 8080
   servlet:
     context-path: /weinv
 
@@ -17,11 +17,11 @@ security:
       jwk:
         # Tells the JWK framework to fetch keys from the authorization server during startup
         # Note: The authorization server needs to be running...
-        #key-set-uri: http://localhost:8888/weinv/.well-known/jwks.json
+        key-set-uri: http://localhost:8080/weinv/.well-known/jwks.json
         ### render.com ####
         #key-set-uri: https://weinv-services.onrender.com/weinv/.well-known/jwks.json
         ### clever-cloud.com ####
-        key-set-uri: https://weinv-service.cleverapps.io/weinv/.well-known/jwks.json
+        #key-set-uri: https://weinv-service.cleverapps.io/weinv/.well-known/jwks.json
 
 spring:
   application:
@@ -113,17 +113,17 @@ weinv:
     description: "weinv-services"
 
   auth-server:
-    #login: "http://localhost:8888/weinv/oauth/token"
-    #users: "http://localhost:8888/weinv/users"
-    #clients: "http://localhost:8888/weinv/clients"
+    login: "http://localhost:8080/weinv/oauth/token"
+    users: "http://localhost:8080/weinv/users"
+    clients: "http://localhost:8080/weinv/clients"
     ### render ###
     #login: "https://weinv-services.onrender.com/weinv/oauth/token"
     #users: "https://weinv-services.onrender.com/weinv/users"
     #clients: "https://weinv-services.onrender.com/weinv/clients"
     ### clever-cloud ###
-    login: "https://weinv-service.cleverapps.io/weinv/oauth/token"
-    users: "https://weinv-service.cleverapps.io/weinv/users"
-    clients: "https://weinv-service.cleverapps.io/weinv/clients"
+    #login: "https://weinv-service.cleverapps.io/weinv/oauth/token"
+    #users: "https://weinv-service.cleverapps.io/weinv/users"
+    #clients: "https://weinv-service.cleverapps.io/weinv/clients"
 
   client-id: "weinv"
   client-secret: "WEINV.ClientSecret1@"

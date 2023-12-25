@@ -2,8 +2,8 @@ package com.mainthreadlab.weinv.model;
 
 
 import com.mainthreadlab.weinv.enums.EventType;
-import com.mainthreadlab.weinv.model.base.BaseEntity;
 import com.mainthreadlab.weinv.enums.Language;
+import com.mainthreadlab.weinv.model.base.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;

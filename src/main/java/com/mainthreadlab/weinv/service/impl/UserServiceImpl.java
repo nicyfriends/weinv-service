@@ -37,12 +37,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -64,24 +62,17 @@ public class UserServiceImpl implements UserService {
     private final WeddingGuestRepository weddingGuestRepository;
     private final ObjectMapper objectMapper;
     private final UserMapper userMapper;
-    private final RestTemplate restTemplate;
     private final EmailService emailSender;
     private final CustomUserDetailsService customUserDetailsService;
 
     @Value("${weinv.auth-server.login}")
     private String uriToken;
 
-    @Value("${weinv.auth-server.users}")
-    private String uriUsers;
-
     @Value("${weinv.client-id}")
     private String clientId;
 
     @Value("${weinv.client-secret}")
     private String clientSecret;
-
-    @Value("${weinv.httpClient.timeout}")
-    private int httpClientTimeout;
 
     @Value("${weinv.mail.account.wedding-responsible.body.fr}")
     private String frAccountCreationBodyFilePath;
@@ -149,10 +140,8 @@ public class UserServiceImpl implements UserService {
                     if (wedding != null) {
                         uuidWedding = wedding.getUuid();
                     }
-                } else if (roles.contains("guest")) {
-                    if (weddingGuest != null) {
-                        uuidWedding = weddingGuest.getWedding().getUuid();
-                    }
+                } else if (roles.contains("guest") && weddingGuest != null) {
+                    uuidWedding = weddingGuest.getWedding().getUuid();
                 }
             }
 

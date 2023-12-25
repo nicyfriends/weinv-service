@@ -57,6 +57,7 @@ import static com.mainthreadlab.weinv.util.CommonUtils.isSourceDateBeforeTargetD
 @RequiredArgsConstructor
 public class WeddingServiceImpl implements WeddingService {
 
+    private static final String GUEST_FIELD = "guest";
     private final WeddingRepository weddingRepository;
     private final WeddingGuestRepository weddingGuestRepository;
     private final UserService userService;
@@ -77,15 +78,6 @@ public class WeddingServiceImpl implements WeddingService {
 
     @Value("${weinv.mail.events.wedding.subject}")
     private String invitationSubject;
-
-    @Value("${weinv.client-id}")
-    private String clientId;
-
-    @Value("${weinv.client-secret}")
-    private String clientSecret;
-
-    @Value("${weinv.auth-server.users}")
-    private String uriUsers;
 
 
     @Override
@@ -146,11 +138,12 @@ public class WeddingServiceImpl implements WeddingService {
             }
         }
 
-        if (Objects.nonNull(userRequest.getTableNumber()) && Objects.nonNull(wedding.getMaxTables())) {
-            if (userRequest.getTableNumber() > wedding.getMaxTables()) {
-                log.error("[Invite] - Table number incorrect, uuid = {}", uuid);
-                throw new BadRequestException(INCORRECT_TABLE_NUMBER);
-            }
+        if (Objects.nonNull(userRequest.getTableNumber()) &&
+                Objects.nonNull(wedding.getMaxTables()) &&
+                (userRequest.getTableNumber() > wedding.getMaxTables())) {
+            log.error("[Invite] - Table number incorrect, uuid = {}", uuid);
+            throw new BadRequestException(INCORRECT_TABLE_NUMBER);
+
         }
 
         userRequest.setRole(Role.GUEST);
@@ -197,17 +190,17 @@ public class WeddingServiceImpl implements WeddingService {
 
         Specification<WeddingGuest> specification = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            query.orderBy(criteriaBuilder.asc(root.get("guest").get("firstName")));
+            query.orderBy(criteriaBuilder.asc(root.get(GUEST_FIELD).get("firstName")));
             predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("wedding").get("uuid"), uuidWedding),
                     criteriaBuilder.greaterThanOrEqualTo(root.get("wedding").get("date"), new Date())));
 
             if (StringUtils.isNotBlank(searchKeyword)) {
                 String key = searchKeyword + "%";
-                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get("guest").get("username"), key),
-                        criteriaBuilder.like(root.get("guest").get("firstName"), key),
-                        criteriaBuilder.like(root.get("guest").get("lastName"), key)));
+                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get(GUEST_FIELD).get("username"), key),
+                        criteriaBuilder.like(root.get(GUEST_FIELD).get("firstName"), key),
+                        criteriaBuilder.like(root.get(GUEST_FIELD).get("lastName"), key)));
             }
-            predicates.add(criteriaBuilder.isTrue(root.get("guest").get("enabled")));
+            predicates.add(criteriaBuilder.isTrue(root.get(GUEST_FIELD).get("enabled")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
         };
         Page<WeddingGuest> weddingGuestList = weddingGuestRepository.findAll(specification, pageable);

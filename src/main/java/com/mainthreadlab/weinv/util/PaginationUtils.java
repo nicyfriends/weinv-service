@@ -14,6 +14,9 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 public class PaginationUtils {
 
+    private PaginationUtils() {
+    }
+
     public static Pageable toPageable(int offset, int limit, String sortingKeys) {
 
         if (StringUtils.isBlank(sortingKeys)) {

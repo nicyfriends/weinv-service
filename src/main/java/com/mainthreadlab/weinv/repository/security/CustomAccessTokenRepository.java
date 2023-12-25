@@ -18,6 +18,4 @@ public interface CustomAccessTokenRepository extends JpaRepository<OauthAccessTo
     List<OauthAccessToken> findByClientIdAndUsername(String clientId, String userName);
 
     List<OauthAccessToken> findByClientId(String clientId);
-
-    Optional<OauthAccessToken> findByToken(String token);
 }

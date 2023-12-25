@@ -1,7 +1,6 @@
 package com.mainthreadlab.weinv.model;
 
 import com.mainthreadlab.weinv.enums.EventType;
-import com.mainthreadlab.weinv.enums.Language;
 import com.mainthreadlab.weinv.enums.WeddingType;
 import com.mainthreadlab.weinv.model.base.BaseEntity;
 import lombok.*;
@@ -43,7 +42,7 @@ public class Wedding extends BaseEntity {
     @Temporal(TemporalType.TIME)
     private Date ceremonyStartime;
 
-    private String ceremonyVenue;      // "venue name, 12, street name, comune/zipcode, city"
+    private String ceremonyVenue;      // "venue name, 12, street name, commune/zipcode, city"
 
     @Temporal(TemporalType.TIME)
     @Column(nullable = false)
@@ -91,7 +90,7 @@ public class Wedding extends BaseEntity {
     private EventType eventType;
 
 
-    //@Lob >> remember that i am not using it anymore to avoid the exception on the browser
+    //@Lob >> remember that I am not using it anymore to avoid the exception on the browser
     @Column(length = 16000000) // This should generate a medium blob
     @Basic(fetch = FetchType.LAZY) // I've read this is default, but anyway...
     public byte[] getSpousesImage() {

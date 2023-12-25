@@ -1,7 +1,6 @@
 package com.mainthreadlab.weinv.config;
 
 import com.mainthreadlab.weinv.service.security.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,15 +20,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
-
-    @Autowired
-    @Qualifier("customAuthenticationEntryPoint")
-    private AuthenticationEntryPoint authenticationEntryPoint;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final PasswordEncoder passwordEncoder;
 
     private static final String[] WHITE_LIST = {
             "/v3/api-docs",
@@ -44,6 +37,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/error",
             "**/oauth/token**"
     };
+
+    public WebSecurityConfiguration(CustomUserDetailsService customUserDetailsService,
+                                    @Qualifier("customAuthenticationEntryPoint") AuthenticationEntryPoint authenticationEntryPoint,
+                                    PasswordEncoder passwordEncoder) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {

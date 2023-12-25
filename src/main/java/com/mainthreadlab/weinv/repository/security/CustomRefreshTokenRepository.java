@@ -9,6 +9,4 @@ import java.util.Optional;
 @Repository
 public interface CustomRefreshTokenRepository extends JpaRepository<OauthRefreshToken, Integer> {
     Optional<OauthRefreshToken> findByTokenId(String tokenId);
-
-    Optional<OauthRefreshToken> findByToken(String refreshToken);
 }

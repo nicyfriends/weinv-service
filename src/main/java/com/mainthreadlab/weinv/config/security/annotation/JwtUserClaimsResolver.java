@@ -8,7 +8,6 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter ;
 
 import java.lang.annotation.Annotation;
 
