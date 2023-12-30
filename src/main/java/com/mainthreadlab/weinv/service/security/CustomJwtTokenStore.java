@@ -4,7 +4,7 @@ import com.mainthreadlab.weinv.model.security.OauthAccessToken;
 import com.mainthreadlab.weinv.model.security.OauthRefreshToken;
 import com.mainthreadlab.weinv.repository.security.CustomAccessTokenRepository;
 import com.mainthreadlab.weinv.repository.security.CustomRefreshTokenRepository;
-import com.mainthreadlab.weinv.util.security.SerializationUtils;
+import com.mainthreadlab.weinv.commons.security.Serialization;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
@@ -52,7 +52,7 @@ public class CustomJwtTokenStore extends JwtTokenStore {
     @Override
     public OAuth2Authentication readAuthentication(String token) {
         Optional<OauthAccessToken> accessToken = accessTokenRepository.findByTokenId(extractTokenKey(token));
-        return accessToken.map(op -> SerializationUtils.deserializeAuthentication(op.getAuthentication())).orElse(null);
+        return accessToken.map(op -> Serialization.deserializeAuthentication(op.getAuthentication())).orElse(null);
     }
 
     @Override
@@ -68,11 +68,11 @@ public class CustomJwtTokenStore extends JwtTokenStore {
 
         OauthAccessToken oauthAccessToken = new OauthAccessToken();
         oauthAccessToken.setTokenId(extractTokenKey(accessToken.getValue()));
-        oauthAccessToken.setToken(SerializationUtils.serialize(accessToken));
+        oauthAccessToken.setToken(Serialization.serialize(accessToken));
         oauthAccessToken.setAuthenticationId(authenticationKeyGenerator.extractKey(authentication));
         oauthAccessToken.setUsername(authentication.isClientOnly() ? null : authentication.getName());
         oauthAccessToken.setClientId(authentication.getOAuth2Request().getClientId());
-        oauthAccessToken.setAuthentication(SerializationUtils.serialize(authentication));
+        oauthAccessToken.setAuthentication(Serialization.serialize(authentication));
         oauthAccessToken.setRefreshToken(extractTokenKey(refreshToken));
 
         accessTokenRepository.save(oauthAccessToken);
@@ -81,7 +81,7 @@ public class CustomJwtTokenStore extends JwtTokenStore {
     @Override
     public OAuth2AccessToken readAccessToken(String tokenValue) {
         Optional<OauthAccessToken> accessToken = accessTokenRepository.findByTokenId(extractTokenKey(tokenValue));
-        return accessToken.map(op -> SerializationUtils.deserializeAccessToken(op.getToken())).orElse(null);
+        return accessToken.map(op -> Serialization.deserializeAccessToken(op.getToken())).orElse(null);
     }
 
     @Override
@@ -94,21 +94,21 @@ public class CustomJwtTokenStore extends JwtTokenStore {
     public void storeRefreshToken(OAuth2RefreshToken refreshToken, OAuth2Authentication authentication) {
         OauthRefreshToken oauthRefreshToken = new OauthRefreshToken();
         oauthRefreshToken.setTokenId(extractTokenKey(refreshToken.getValue()));
-        oauthRefreshToken.setToken(SerializationUtils.serialize(refreshToken));
-        oauthRefreshToken.setAuthentication(SerializationUtils.serialize(authentication));
+        oauthRefreshToken.setToken(Serialization.serialize(refreshToken));
+        oauthRefreshToken.setAuthentication(Serialization.serialize(authentication));
         refreshTokenRepository.save(oauthRefreshToken);
     }
 
     @Override
     public OAuth2RefreshToken readRefreshToken(String tokenValue) {
         Optional<OauthRefreshToken> refreshToken = refreshTokenRepository.findByTokenId(extractTokenKey(tokenValue));
-        return refreshToken.map(op -> SerializationUtils.deserializeRefreshToken(op.getToken())).orElse(null);
+        return refreshToken.map(op -> Serialization.deserializeRefreshToken(op.getToken())).orElse(null);
     }
 
     @Override
     public OAuth2Authentication readAuthenticationForRefreshToken(OAuth2RefreshToken refreshToken) {
         Optional<OauthRefreshToken> oauthRefreshToken = refreshTokenRepository.findByTokenId(extractTokenKey(refreshToken.getValue()));
-        return oauthRefreshToken.map(op -> SerializationUtils.deserializeAuthentication(op.getAuthentication())).orElse(null);
+        return oauthRefreshToken.map(op -> Serialization.deserializeAuthentication(op.getAuthentication())).orElse(null);
     }
 
     @Override
@@ -131,7 +131,7 @@ public class CustomJwtTokenStore extends JwtTokenStore {
         OauthAccessToken token = accessTokens.isEmpty() ? null : DataAccessUtils.nullableSingleResult(accessTokens);
 
         if (token != null) {
-            accessToken = SerializationUtils.deserializeAccessToken(token.getToken());
+            accessToken = Serialization.deserializeAccessToken(token.getToken());
             if (accessToken != null && !authenticationId.equals(authenticationKeyGenerator.extractKey(this.readAuthentication(accessToken)))) {
                 this.removeAccessToken(accessToken);
                 this.storeAccessToken(accessToken, authentication);
@@ -144,7 +144,7 @@ public class CustomJwtTokenStore extends JwtTokenStore {
     public Collection<OAuth2AccessToken> findTokensByClientIdAndUserName(String clientId, String userName) {
         Collection<OAuth2AccessToken> tokens = new ArrayList<>();
         List<OauthAccessToken> result = accessTokenRepository.findByClientIdAndUsername(clientId, userName);
-        result.forEach(e -> tokens.add(SerializationUtils.deserializeAccessToken(e.getToken())));
+        result.forEach(e -> tokens.add(Serialization.deserializeAccessToken(e.getToken())));
         return tokens;
     }
 
@@ -152,7 +152,7 @@ public class CustomJwtTokenStore extends JwtTokenStore {
     public Collection<OAuth2AccessToken> findTokensByClientId(String clientId) {
         Collection<OAuth2AccessToken> tokens = new ArrayList<>();
         List<OauthAccessToken> result = accessTokenRepository.findByClientId(clientId);
-        result.forEach(e -> tokens.add(SerializationUtils.deserializeAccessToken(e.getToken())));
+        result.forEach(e -> tokens.add(Serialization.deserializeAccessToken(e.getToken())));
         return tokens;
     }
 

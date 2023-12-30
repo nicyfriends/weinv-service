@@ -26,6 +26,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendSimpleMessage(String from, String[] to, String subject, String text) {
         try {
+            log.info("[sendSimpleMessage] - start: subject={}, from={}, to={}", subject, from, to);
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(to);
             message.setFrom(from);
@@ -33,20 +34,21 @@ public class EmailServiceImpl implements EmailService {
             message.setText(text);
             emailSender.send(message);
         } catch (Exception ex) {
-            log.error("Failed to send mail invitation: {}", ex.getMessage(), ex);
+            log.error("[sendSimpleMessage] - failed to send mail invitation: {}", ex.getMessage(), ex);
         }
     }
 
     @Override
     public void sendHtmlEmail(String to, String subject, String htmlContent) {
         try {
+            log.info("[sendHtmlEmail] - start: subject={}, to={}", subject, to);
             MimeMessage message = emailSender.createMimeMessage();
             message.setRecipients(Message.RecipientType.TO, to);
             message.setSubject(subject);
             message.setContent(htmlContent, "text/html; charset=utf-8");
             emailSender.send(message);
         } catch (Exception ex) {
-            log.error("Failed to send mail invitation: {}", ex.getMessage(), ex);
+            log.error("[sendHtmlEmail] - failed to send mail invitation: {}", ex.getMessage(), ex);
         }
     }
 

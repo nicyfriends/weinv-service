@@ -11,7 +11,7 @@ import com.mainthreadlab.weinv.dto.response.InvitationResponse;
 import com.mainthreadlab.weinv.dto.response.WeddingResponse;
 import com.mainthreadlab.weinv.service.WeddingService;
 import com.mainthreadlab.weinv.dto.response.ErrorResponse;
-import com.mainthreadlab.weinv.util.PaginationUtils;
+import com.mainthreadlab.weinv.commons.Pagination;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -165,7 +165,7 @@ public class WeddingController {
             HttpServletRequest request) {
 
         log.info("[GetWeddingInvitations] request: {}", request.getRequestURI());
-        Page<InvitationResponse> invitationsResponse = weddingService.getWeddingInvitations(uuid, searchKeyword, PaginationUtils.toPageable(offset, limit, sortingKeys));
+        Page<InvitationResponse> invitationsResponse = weddingService.getWeddingInvitations(uuid, searchKeyword, Pagination.toPageable(offset, limit, sortingKeys));
         return ResponseEntity.ok().body(invitationsResponse);
     }
 
@@ -188,7 +188,7 @@ public class WeddingController {
             HttpServletRequest request) {
 
         log.info("[GetWeddings] request: {}", request.getRequestURI());
-        List<WeddingResponse> response = weddingService.getWeddings(PaginationUtils.toPageable(offset, limit, sortingKeys));
+        List<WeddingResponse> response = weddingService.getWeddings(Pagination.toPageable(offset, limit, sortingKeys));
         return ResponseEntity.ok().body(response);
     }
 

@@ -1,4 +1,4 @@
-package com.mainthreadlab.weinv.util.security;
+package com.mainthreadlab.weinv.commons.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -7,10 +7,10 @@ import org.springframework.security.oauth2.common.OAuth2RefreshToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
 @Slf4j
-public class SerializationUtils {
+public class Serialization {
 
 
-    private SerializationUtils() {
+    private Serialization() {
     }
 
 

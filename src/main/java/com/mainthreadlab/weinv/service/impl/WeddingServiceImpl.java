@@ -28,7 +28,7 @@ import com.mainthreadlab.weinv.service.EmailService;
 import com.mainthreadlab.weinv.service.UserService;
 import com.mainthreadlab.weinv.service.WeddingService;
 import com.mainthreadlab.weinv.service.security.CustomUserDetailsService;
-import com.mainthreadlab.weinv.util.CommonUtils;
+import com.mainthreadlab.weinv.commons.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 
 import static com.mainthreadlab.weinv.enums.ErrorKey.*;
 import static com.mainthreadlab.weinv.enums.EventType.WEDDING;
-import static com.mainthreadlab.weinv.util.CommonUtils.isSourceDateBeforeTargetDate;
+import static com.mainthreadlab.weinv.commons.Utils.isSourceDateBeforeTargetDate;
 
 @Slf4j
 @Service
@@ -528,9 +528,9 @@ public class WeddingServiceImpl implements WeddingService {
 
     private void sendMail(Wedding wedding, UserRequest userRequest) {
         try {
-            String template = CommonUtils.readFileFromResource(frInvitationBodyFilePath);
+            String template = Utils.readFileFromResource(frInvitationBodyFilePath);
             if (Language.EN.equals(userRequest.getLanguage())) {
-                template = CommonUtils.readFileFromResource(enInvitationBodyFilePath);
+                template = Utils.readFileFromResource(enInvitationBodyFilePath);
             }
 
             template = template.replace("{f_firstname}", wedding.getWifeName())

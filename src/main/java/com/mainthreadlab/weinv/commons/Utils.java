@@ -1,4 +1,4 @@
-package com.mainthreadlab.weinv.util;
+package com.mainthreadlab.weinv.commons;
 
 import io.micrometer.core.instrument.util.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -15,9 +15,9 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
 
-public class CommonUtils {
+public class Utils {
 
-    private CommonUtils() {
+    private Utils() {
     }
 
     public static String getBasicAuthenticationHeader(String username, String password) {
@@ -32,7 +32,7 @@ public class CommonUtils {
     }
 
     public static String readFileFromResource(String fileName) {
-        ClassLoader classLoader = CommonUtils.class.getClassLoader();
+        ClassLoader classLoader = Utils.class.getClassLoader();
         InputStream resource = classLoader.getResourceAsStream(fileName);
         if (resource == null) {
             throw new IllegalStateException("FIle not found! " + fileName);

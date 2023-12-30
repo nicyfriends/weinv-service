@@ -1,7 +1,8 @@
 package com.mainthreadlab.weinv.config.security.annotation;
 
+import com.mainthreadlab.weinv.commons.Constants;
 import com.mainthreadlab.weinv.exception.UnauthorizedException;
-import com.mainthreadlab.weinv.util.TokenUtils;
+import com.mainthreadlab.weinv.commons.Token;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -24,8 +25,8 @@ public class JwtUserClaimsResolver implements HandlerMethodArgumentResolver {
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
-        String authorizationHeader = webRequest.getHeader("Authorization");
-        JwtDetails jwtDetails = TokenUtils.getJwtDetails(authorizationHeader);
+        String authorizationHeader = webRequest.getHeader(Constants.AUTHORIZATION);
+        JwtDetails jwtDetails = Token.getJwtDetails(authorizationHeader);
         if (jwtDetails == null) {
             throw new UnauthorizedException(WRONG_USERNAME_OR_PWD);
         }

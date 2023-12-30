@@ -1,6 +1,7 @@
 package com.mainthreadlab.weinv.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mainthreadlab.weinv.commons.Constants;
 import com.mainthreadlab.weinv.config.security.annotation.JwtDetails;
 import com.mainthreadlab.weinv.dto.request.CredentialsRequest;
 import com.mainthreadlab.weinv.dto.request.UpdateUserRequest;
@@ -25,7 +26,7 @@ import com.mainthreadlab.weinv.repository.WeddingRepository;
 import com.mainthreadlab.weinv.service.EmailService;
 import com.mainthreadlab.weinv.service.UserService;
 import com.mainthreadlab.weinv.service.security.CustomUserDetailsService;
-import com.mainthreadlab.weinv.util.CommonUtils;
+import com.mainthreadlab.weinv.commons.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -45,10 +46,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.mainthreadlab.weinv.enums.ErrorKey.*;
-import static com.mainthreadlab.weinv.util.CommonUtils.isSourceDateBeforeTargetDate;
+import static com.mainthreadlab.weinv.commons.Utils.isSourceDateBeforeTargetDate;
 
 
 @Slf4j
@@ -87,11 +87,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public LoginResponse login(CredentialsRequest credentialsRequest) throws URISyntaxException, IOException {
-        log.info("[Login] - start: username={}", credentialsRequest.getUsername());
+        log.info("[login] - start: username={}", credentialsRequest.getUsername());
 
         User user = userRepository.findByUsernameAndEnabledTrue(credentialsRequest.getUsername());
         if (user == null) {
-            log.error("[Login] - User not found, username = {}", credentialsRequest.getUsername());
+            log.error("[login] - user not found, username = {}", credentialsRequest.getUsername());
             throw new ResourceNotFoundException(USER_NOT_FOUND);
         }
 
@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (wedding != null && isSourceDateBeforeTargetDate(wedding.getDate(), new Date())) {
-            log.error("[Login] - Wedding date is expired, date={}", wedding.getDate());
+            log.error("[login] - wedding date is expired, date={}", wedding.getDate());
             throw new ForbiddenException();
         }
 
@@ -116,17 +116,17 @@ public class UserServiceImpl implements UserService {
 
         HttpPost request = new HttpPost();
         request.setURI(uri);
-        request.setHeader("Authorization", CommonUtils.getBasicAuthenticationHeader(clientId, clientSecret));
+        request.setHeader(Constants.AUTHORIZATION, Utils.getBasicAuthenticationHeader(clientId, clientSecret));
 
-        log.info("[Login] (weinv > authz-server): username={}", credentialsRequest.getUsername());
+        log.info("[login] (weinv > authz-server): username={}", credentialsRequest.getUsername());
 
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();
              CloseableHttpResponse httpResponse = httpClient.execute(request)) {
 
-            String bodyString = CommonUtils.getResponseBody(httpResponse);
+            String bodyString = Utils.getResponseBody(httpResponse);
             if (httpResponse.getStatusLine().getStatusCode() != 200) {
-                String errorDescription = httpResponse.getStatusLine().getStatusCode() + " - " + bodyString;
-                log.error("[Login] - Wrong password: {}", errorDescription);
+                String errorDescription = Constants.ERROR_DESCRIPTION.formatted(httpResponse.getStatusLine().getStatusCode(), bodyString);
+                log.error("[login] - wrong password: {}", errorDescription);
                 throw new UnauthorizedException(WRONG_PASSWORD);
             }
 
@@ -150,13 +150,11 @@ public class UserServiceImpl implements UserService {
             loginResponse.setFirstName(user.getFirstName());
             loginResponse.setLastName(user.getLastName());
             loginResponse.setEventType(user.getEventType());
-            List<String> roles = Arrays.stream(user.getRoles().split(","))
-                    .map(userMapper::mapRole).collect(Collectors.toList());
+            List<String> roles = Arrays.stream(user.getRoles().split(",")).map(userMapper::mapRole).toList();
             loginResponse.setRoles(roles);
             user.setLastLoginDate(new Date());
 
-            log.info("[Login] - success: username={}", credentialsRequest.getUsername());
-            log.info("[Login] - end");
+            log.info("[login] - success: username={}", credentialsRequest.getUsername());
             return loginResponse;
         }
     }
@@ -182,9 +180,9 @@ public class UserServiceImpl implements UserService {
         AuthUserRequest authUserRequest = userMapper.toAuthUser(userRequest);
         customUserDetailsService.addUserDetails(authUserRequest);
 
-        String template = CommonUtils.readFileFromResource(enAccountCreationBodyFilePath);
+        String template = Utils.readFileFromResource(enAccountCreationBodyFilePath);
         if (Language.FR.equals(user.getLanguage())) {
-            template = CommonUtils.readFileFromResource(frAccountCreationBodyFilePath);
+            template = Utils.readFileFromResource(frAccountCreationBodyFilePath);
         }
         template = template.replace("{username}", userRequest.getUsername()).replace("{password}", userRequest.getPassword());
 
@@ -199,15 +197,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(String uuidUser, String uuidWedding) {
-        log.info("[DeleteUser] - start: uuidUser={}, uuidWedding={}", uuidUser, uuidWedding);
+        log.info("[deleteUser] - start: uuidUser={}, uuidWedding={}", uuidUser, uuidWedding);
 
         User user = getByUuid(uuidUser);
         if (user == null) {
-            log.error("[DeleteUser] - User not found, uuid={}", uuidUser);
+            log.error("[deleteUser] - User not found, uuid={}", uuidUser);
             throw new ResourceNotFoundException(USER_NOT_FOUND);
         }
 
-        log.info("[DeleteUser] delete wedding invitation (if it exists)");
+        log.info("[deleteUser] - delete wedding invitation (if it exists)");
         if (StringUtils.isNotBlank(uuidWedding)) {
             Wedding wedding = weddingRepository.findByUuid(uuidWedding);
             if (wedding != null) {
@@ -215,15 +213,13 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        log.info("[DeleteUser] delete user from weinv");
+        log.info("[deleteUser] - delete user from weinv");
         userRepository.delete(user);
 
-        log.info("[DeleteUser] delete user from authorization-server");
+        log.info("[deleteUser] - delete user from authorization-server");
         customUserDetailsService.delete(user.getUsername());
 
-        log.info("[DeleteUser] - success: username={}", user.getUsername());
-        log.info("[DeleteUser] - end");
-
+        log.info("[deleteUser] - success: username={}", user.getUsername());
     }
 
     @Override

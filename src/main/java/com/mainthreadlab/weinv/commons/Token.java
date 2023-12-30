@@ -1,4 +1,4 @@
-package com.mainthreadlab.weinv.util;
+package com.mainthreadlab.weinv.commons;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,14 +10,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 
-public class TokenUtils {
+public class Token {
 
-    private TokenUtils() {
+    private Token() {
     }
 
     public static JwtDetails getJwtDetails(String header) throws ParseException {
-        if (StringUtils.isNotBlank(header) && header.contains("Bearer ")) {
-            String accessToken = header.replace("Bearer ", "");
+        if (StringUtils.isNotBlank(header) && header.contains(Constants.BEARER)) {
+            String accessToken = header.replace(Constants.BEARER, "");
             JWT jwt = JWTParser.parse(accessToken);
             JWTClaimsSet jwtClaimSet = jwt.getJWTClaimsSet();
             ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

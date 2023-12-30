@@ -54,7 +54,7 @@ public class CustomUserDetailsService extends JdbcDaoImpl {
         logger.info("AUTHORIZATION-SERVER > [loadUserByUsername] - start");
         UserAuth user = customUserDetailsRepository.findByUsername(username);
         if (user == null) {
-            log.error("AUTHORIZATION-SERVER > [loadUserByUsername] - Wrong username {}", username);
+            log.error("AUTHORIZATION-SERVER > [loadUserByUsername] - wrong username {}", username);
             throw new UsernameNotFoundException(WRONG_USERNAME);
         }
         CustomUserDetails userDetails = new CustomUserDetails(user, loadUserAuthorities(username));
@@ -81,13 +81,12 @@ public class CustomUserDetailsService extends JdbcDaoImpl {
         logger.info("AUTHORIZATION-SERVER > [addUserDetails] - start");
         UserAuth user = customUserDetailsRepository.findByUsername(authUserRequest.getUsername());
         if (user != null) {
-            //throw new UniqueConstraintViolationException(User.class.getSimpleName(), authUserRequest.getUsername());
             log.warn("AUTHORIZATION-SERVER > [addUserDetails] - user {} already exists", authUserRequest.getUsername());
             return;
         }
 
         if (StringUtils.isBlank(authUserRequest.getRoles())) {
-            log.error("AUTHORIZATION-SERVER > [addUserDetails] - Roles field is missing, username={}", authUserRequest.getUsername());
+            log.error("AUTHORIZATION-SERVER > [addUserDetails] - roles field is missing, username={}", authUserRequest.getUsername());
             throw new BadRequestException(MISSING_ROLES_FIELD);
         }
 
@@ -123,7 +122,7 @@ public class CustomUserDetailsService extends JdbcDaoImpl {
         logger.info("AUTHORIZATION-SERVER > [updateUser] - start");
         UserAuth user = customUserDetailsRepository.findByUsername(authUpdateUserRequest.getUsername());
         if (user == null) {
-            log.error("AUTHORIZATION-SERVER > [updateUser] - User not found, username={}", authUpdateUserRequest.getUsername());
+            log.error("AUTHORIZATION-SERVER > [updateUser] - user not found, username={}", authUpdateUserRequest.getUsername());
             throw new ResourceNotFoundException(USER_NOT_FOUND);
         }
 
@@ -131,7 +130,7 @@ public class CustomUserDetailsService extends JdbcDaoImpl {
         String newPassword = authUpdateUserRequest.getNewPassword();
         if (StringUtils.isNotBlank(currentPassword) && StringUtils.isNotBlank(newPassword)) {
             if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-                log.error("AUTHORIZATION-SERVER > [updateUser] - Wrong password, username={}", authUpdateUserRequest.getUsername());
+                log.error("AUTHORIZATION-SERVER > [updateUser] - wrong password, username={}", authUpdateUserRequest.getUsername());
                 throw new BadCredentialsException(WRONG_PASSWORD);
             }
             user.setPassword(passwordEncoder.encode(newPassword));
@@ -140,6 +139,7 @@ public class CustomUserDetailsService extends JdbcDaoImpl {
         if (StringUtils.isNotBlank(authUpdateUserRequest.getEmail())) {
             user.setEmail(authUpdateUserRequest.getEmail());
         }
+
         logger.info("AUTHORIZATION-SERVER > [updateUser] - success");
     }
 
@@ -150,7 +150,7 @@ public class CustomUserDetailsService extends JdbcDaoImpl {
 
         UserAuth user = customUserDetailsRepository.findByUsername(username);
         if (user == null) {
-            log.error("AUTHORIZATION-SERVER > [responsiblePwdRecovery] - User not found, username={}", username);
+            log.error("AUTHORIZATION-SERVER > [responsiblePwdRecovery] - user not found, username={}", username);
             throw new ResourceNotFoundException(USER_NOT_FOUND);
         }
 

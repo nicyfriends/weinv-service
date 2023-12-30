@@ -31,12 +31,10 @@
 	</developers>
 
 	<properties>
-		<java.version>11</java.version>
-		<java.version>11</java.version>
+		<java.version>20</java.version>
+		<java.version>20</java.version>
 		<io.micrometer.version>1.10.5</io.micrometer.version>
 		<com.nimbusds.version>9.25.6</com.nimbusds.version>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.release>11</maven.compiler.release>
 		<org.lombok.version>1.18.30</org.lombok.version>
 		<org.springdoc.version>1.6.6</org.springdoc.version>
@@ -219,9 +217,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven.compiler.plugin.version}</version>
 				<configuration>
-					<source>${maven.compiler.source}</source>
-					<target>${maven.compiler.target}</target>
-					<release>${maven.compiler.release}</release>
+					<release>${java.version}</release>
 					<verbose>true</verbose>
 					<annotationProcessorPaths>
 						<path>

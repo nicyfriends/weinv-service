@@ -4,7 +4,7 @@ import com.mainthreadlab.weinv.model.Wedding;
 import com.mainthreadlab.weinv.enums.Language;
 import com.mainthreadlab.weinv.dto.request.WeddingRequest;
 import com.mainthreadlab.weinv.dto.response.WeddingResponse;
-import com.mainthreadlab.weinv.util.CommonUtils;
+import com.mainthreadlab.weinv.commons.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-import static com.mainthreadlab.weinv.util.CommonUtils.isSourceDateBeforeTargetDate;
+import static com.mainthreadlab.weinv.commons.Utils.isSourceDateBeforeTargetDate;
 
 @Slf4j
 @Mapper(componentModel = "spring")
@@ -52,9 +52,9 @@ public abstract class WeddingMapper {
 
         try {
             if (StringUtils.isBlank(source.getInvitationOtherText())) {
-                String invitationOtherText = CommonUtils.readFileFromResource(defaultInvitationOtherTextFR);
+                String invitationOtherText = Utils.readFileFromResource(defaultInvitationOtherTextFR);
                 if (Language.EN.equals(source.getLanguage())) {
-                    invitationOtherText = CommonUtils.readFileFromResource(defaultInvitationOtherTextEN);
+                    invitationOtherText = Utils.readFileFromResource(defaultInvitationOtherTextEN);
                 }
                 target.setInvitationOtherText(invitationOtherText);
             }

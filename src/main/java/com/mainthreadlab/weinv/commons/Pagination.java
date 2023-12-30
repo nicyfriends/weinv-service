@@ -1,4 +1,4 @@
-package com.mainthreadlab.weinv.util;
+package com.mainthreadlab.weinv.commons;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
-public class PaginationUtils {
+public class Pagination {
 
-    private PaginationUtils() {
+    private Pagination() {
     }
 
     public static Pageable toPageable(int offset, int limit, String sortingKeys) {
