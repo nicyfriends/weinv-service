@@ -31,8 +31,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.mainthreadlab.weinv.enums.ErrorKey.GENERIC_ERROR;
-import static com.mainthreadlab.weinv.enums.ErrorKey.VALIDATION_ERROR;
+import static com.mainthreadlab.weinv.model.enums.ErrorKey.GENERIC_ERROR;
+import static com.mainthreadlab.weinv.model.enums.ErrorKey.VALIDATION_ERROR;
 
 @RestControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {

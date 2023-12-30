@@ -2,6 +2,7 @@ package com.mainthreadlab.weinv.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mainthreadlab.weinv.commons.Constants;
+import com.mainthreadlab.weinv.commons.Utils;
 import com.mainthreadlab.weinv.config.security.annotation.JwtDetails;
 import com.mainthreadlab.weinv.dto.request.CredentialsRequest;
 import com.mainthreadlab.weinv.dto.request.UpdateUserRequest;
@@ -10,8 +11,6 @@ import com.mainthreadlab.weinv.dto.response.LoginResponse;
 import com.mainthreadlab.weinv.dto.response.UserResponse;
 import com.mainthreadlab.weinv.dto.security.AuthUpdateUserRequest;
 import com.mainthreadlab.weinv.dto.security.AuthUserRequest;
-import com.mainthreadlab.weinv.enums.Language;
-import com.mainthreadlab.weinv.enums.Role;
 import com.mainthreadlab.weinv.exception.ForbiddenException;
 import com.mainthreadlab.weinv.exception.ResourceNotFoundException;
 import com.mainthreadlab.weinv.exception.UnauthorizedException;
@@ -20,13 +19,14 @@ import com.mainthreadlab.weinv.mapper.UserMapper;
 import com.mainthreadlab.weinv.model.User;
 import com.mainthreadlab.weinv.model.Wedding;
 import com.mainthreadlab.weinv.model.WeddingGuest;
+import com.mainthreadlab.weinv.model.enums.Language;
+import com.mainthreadlab.weinv.model.enums.Role;
 import com.mainthreadlab.weinv.repository.UserRepository;
 import com.mainthreadlab.weinv.repository.WeddingGuestRepository;
 import com.mainthreadlab.weinv.repository.WeddingRepository;
 import com.mainthreadlab.weinv.service.EmailService;
 import com.mainthreadlab.weinv.service.UserService;
 import com.mainthreadlab.weinv.service.security.CustomUserDetailsService;
-import com.mainthreadlab.weinv.commons.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -47,8 +47,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static com.mainthreadlab.weinv.enums.ErrorKey.*;
 import static com.mainthreadlab.weinv.commons.Utils.isSourceDateBeforeTargetDate;
+import static com.mainthreadlab.weinv.model.enums.ErrorKey.*;
 
 
 @Slf4j
@@ -89,18 +89,20 @@ public class UserServiceImpl implements UserService {
     public LoginResponse login(CredentialsRequest credentialsRequest) throws URISyntaxException, IOException {
         log.info("[login] - start: username={}", credentialsRequest.getUsername());
 
+        // in order to simplify user usage
+        credentialsRequest.setUsername(credentialsRequest.getUsername().trim().toLowerCase());
+        credentialsRequest.setPassword(credentialsRequest.getPassword().trim().toLowerCase());
+
         User user = userRepository.findByUsernameAndEnabledTrue(credentialsRequest.getUsername());
         if (user == null) {
             log.error("[login] - user not found, username = {}", credentialsRequest.getUsername());
             throw new ResourceNotFoundException(USER_NOT_FOUND);
         }
 
-        Wedding wedding;
+        Wedding wedding = weddingRepository.findByResponsible(user);
         WeddingGuest weddingGuest = weddingGuestRepository.findByGuest(user);
-        if (weddingGuest != null) {
+        if (wedding == null && weddingGuest != null) {
             wedding = weddingGuest.getWedding();
-        } else {
-            wedding = weddingRepository.findByResponsible(user);
         }
 
         if (wedding != null && isSourceDateBeforeTargetDate(wedding.getDate(), new Date())) {
@@ -118,7 +120,7 @@ public class UserServiceImpl implements UserService {
         request.setURI(uri);
         request.setHeader(Constants.AUTHORIZATION, Utils.getBasicAuthenticationHeader(clientId, clientSecret));
 
-        log.info("[login] (weinv > authz-server): username={}", credentialsRequest.getUsername());
+        log.info("[login] - trying authentication in authorization-server: username={}", credentialsRequest.getUsername());
 
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();
              CloseableHttpResponse httpResponse = httpClient.execute(request)) {
@@ -135,12 +137,12 @@ public class UserServiceImpl implements UserService {
             String uuidWedding = null;
             if (StringUtils.isNotBlank(user.getRoles())) {
                 List<String> roles = Arrays.asList(user.getRoles().split(","));
-                if (roles.contains("user")) {
+                if (roles.contains(Role.USER.getDescription())) {
                     wedding = weddingRepository.findByResponsible(user);
                     if (wedding != null) {
                         uuidWedding = wedding.getUuid();
                     }
-                } else if (roles.contains("guest") && weddingGuest != null) {
+                } else if (roles.contains(Role.GUEST.getDescription()) && weddingGuest != null) {
                     uuidWedding = weddingGuest.getWedding().getUuid();
                 }
             }
@@ -166,17 +168,20 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public String registerWeddingResponsible(JwtDetails jwtDetails, UserRequest userRequest) {
-        log.info("[RegisterWeddingResponsible] - start: username={}", userRequest.getUsername());
+        log.info("[registerWeddingResponsible] - start: username={}", userRequest.getUsername());
 
+        // in order to simplify user usage
+        userRequest.setUsername(userRequest.getUsername().trim().toLowerCase());
+        userRequest.setPassword(userRequest.getPassword().trim().toLowerCase());
         userRequest.setFirstName(StringUtils.capitalize(userRequest.getFirstName()));
         userRequest.setLastName(StringUtils.capitalize(userRequest.getLastName()));
 
-        log.info("[RegisterWeddingResponsible] save in weinv");
+        log.info("[registerWeddingResponsible] - save in weinv");
         userRequest.setRole(Role.USER);
         if (userRequest.getPrice() == null) userRequest.setPrice(0D);
         User user = save(userRequest);
 
-        log.info("[RegisterWeddingResponsible] save in authorization-server");
+        log.info("[registerWeddingResponsible] - save in authorization-server");
         AuthUserRequest authUserRequest = userMapper.toAuthUser(userRequest);
         customUserDetailsService.addUserDetails(authUserRequest);
 
@@ -189,8 +194,7 @@ public class UserServiceImpl implements UserService {
         emailSender.sendHtmlEmail(user.getEmail(), accountCreationSubject, template);
         emailSender.sendHtmlEmail(jwtDetails.getEmail(), accountCreationSubject, template);
 
-        log.info("[RegisterWeddingResponsible] - success: username={}", userRequest.getUsername());
-        log.info("[RegisterWeddingResponsible] - end");
+        log.info("[registerWeddingResponsible] - success: username={}", userRequest.getUsername());
         return user.getUuid();
     }
 

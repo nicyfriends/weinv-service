@@ -1,8 +1,7 @@
 package com.mainthreadlab.weinv.dto.request;
 
-import com.mainthreadlab.weinv.enums.EventType;
-import com.mainthreadlab.weinv.enums.Language;
-import com.mainthreadlab.weinv.enums.WeddingType;
+import com.mainthreadlab.weinv.model.enums.Language;
+import com.mainthreadlab.weinv.model.enums.WeddingType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +9,6 @@ import lombok.Setter;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Getter

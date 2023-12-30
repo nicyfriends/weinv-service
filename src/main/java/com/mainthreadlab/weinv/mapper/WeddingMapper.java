@@ -1,7 +1,7 @@
 package com.mainthreadlab.weinv.mapper;
 
 import com.mainthreadlab.weinv.model.Wedding;
-import com.mainthreadlab.weinv.enums.Language;
+import com.mainthreadlab.weinv.model.enums.Language;
 import com.mainthreadlab.weinv.dto.request.WeddingRequest;
 import com.mainthreadlab.weinv.dto.response.WeddingResponse;
 import com.mainthreadlab.weinv.commons.Utils;

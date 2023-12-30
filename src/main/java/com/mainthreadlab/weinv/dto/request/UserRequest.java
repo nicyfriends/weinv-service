@@ -1,8 +1,8 @@
 package com.mainthreadlab.weinv.dto.request;
 
-import com.mainthreadlab.weinv.enums.EventType;
-import com.mainthreadlab.weinv.enums.Language;
-import com.mainthreadlab.weinv.enums.Role;
+import com.mainthreadlab.weinv.model.enums.EventType;
+import com.mainthreadlab.weinv.model.enums.Language;
+import com.mainthreadlab.weinv.model.enums.Role;
 import com.mainthreadlab.weinv.validator.ContactNumberConstraint;
 import lombok.Data;
 import lombok.ToString;

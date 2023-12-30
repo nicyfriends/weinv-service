@@ -12,7 +12,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.lang.annotation.Annotation;
 
-import static com.mainthreadlab.weinv.enums.ErrorKey.WRONG_USERNAME_OR_PWD;
+import static com.mainthreadlab.weinv.model.enums.ErrorKey.WRONG_USERNAME_OR_PWD;
 
 public class JwtUserClaimsResolver implements HandlerMethodArgumentResolver {
 

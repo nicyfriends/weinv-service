@@ -1,7 +1,7 @@
 package com.mainthreadlab.weinv.model;
 
-import com.mainthreadlab.weinv.enums.EventType;
-import com.mainthreadlab.weinv.enums.WeddingType;
+import com.mainthreadlab.weinv.model.enums.EventType;
+import com.mainthreadlab.weinv.model.enums.WeddingType;
 import com.mainthreadlab.weinv.model.base.BaseEntity;
 import lombok.*;
 

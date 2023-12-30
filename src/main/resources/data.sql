@@ -12,17 +12,17 @@
 ----------------------------------------------------------------
                 -- WEINV-AUTHORIZATION-SERVER --
 ----------------------------------------------------------------
----- The encrypted client_secret is `WEINV.ClientSecret1@`
+---- The encrypted client_secret is `weinv1@client.secret`
 ---- Access_token_validity: 20min
 ---- Refresh_token_validity: 8h
 --INSERT INTO oauth_client_details (resource_ids, client_id, client_secret, scope, authorized_grant_types, authorities, access_token_validity, refresh_token_validity, web_server_redirect_uri, additional_information)
---VALUES ('WEDDING-INVITATION', 'weinv', '$2a$12$OHkz3bL4lceeK7MdvhwQye7zyYQ0T1yw5JfzADhbfuNRtRLakf.xa', 'read,write', 'password,refresh_token,client_credentials', 'client', 1200, 28800, 'https://weinv-services.cleverapps.io/weinv/login', '{}');
+--VALUES ('WEDDING-INVITATION', 'weinv', '$2a$12$5iyG9zrPNRhi8akByKeA/ez0nDiFocUMdmoiXe82iNk8xN7dbn..q', 'read,write', 'password,refresh_token,client_credentials', 'client', 1200, 28800, 'https://weinv-services.cleverapps.io/weinv/login', '{}');
 --
----- The encrypted password is `WEINV.AdminSecret1@`
---INSERT INTO users (id, username, password, email) VALUES (1, 'weinvAdmin', '$2a$12$6axno88QLQk3YfrDa7aF4.BuXYhv2CoAmnFJJwqYB4K9tnu4HA3zq', 'malandanicy@gmail.com');
----- The encrypted password is `Password1@`
---INSERT INTO users (id, username, password, email) VALUES (2, 'responsibleTest', '$2a$12$sRjrM5pT4vOfWAXyM.8LNe8Jh2T4n7nnK9mg/m0k18YAaouXPvRsi', 'nicy.lab.noreply@gmail.com');
---INSERT INTO users (id, username, password, email) VALUES (3, 'guestTest', '$2a$12$sRjrM5pT4vOfWAXyM.8LNe8Jh2T4n7nnK9mg/m0k18YAaouXPvRsi', 'nicy.lab.noreply@gmail.com');
+---- The encrypted password is `weinv1@admin.secret`
+--INSERT INTO users (id, username, password, email) VALUES (1, 'weinvAdmin', '$2a$12$BtGQ9IDSmsYSfjofVeISre.Wlvrl9hvkvAW2GjAtFnr1bHVyAGhDG', 'malandanicy@gmail.com');
+---- The encrypted password is `password`
+--INSERT INTO users (id, username, password, email) VALUES (2, 'responsibleTest', '$2a$12$PpwKquVwHdEJ4Qqj.KYPNe6FATlc3auhCfH6TQ3InjzbKyP/w9C8S', 'nicy.lab.noreply@gmail.com');
+--INSERT INTO users (id, username, password, email) VALUES (3, 'guestTest', '$2a$12$PpwKquVwHdEJ4Qqj.KYPNe6FATlc3auhCfH6TQ3InjzbKyP/w9C8S', 'nicy.lab.noreply@gmail.com');
 --
 --
 --INSERT INTO authorities (id, name) VALUES (1, 'admin');

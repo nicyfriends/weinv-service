@@ -12,8 +12,8 @@ import com.mainthreadlab.weinv.dto.request.WeddingUpdateRequest;
 import com.mainthreadlab.weinv.dto.response.InvitationResponse;
 import com.mainthreadlab.weinv.dto.response.WeddingResponse;
 import com.mainthreadlab.weinv.dto.security.AuthUserRequest;
-import com.mainthreadlab.weinv.enums.Language;
-import com.mainthreadlab.weinv.enums.Role;
+import com.mainthreadlab.weinv.model.enums.Language;
+import com.mainthreadlab.weinv.model.enums.Role;
 import com.mainthreadlab.weinv.exception.BadRequestException;
 import com.mainthreadlab.weinv.exception.ResourceNotFoundException;
 import com.mainthreadlab.weinv.mapper.UserMapper;
@@ -47,8 +47,8 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.mainthreadlab.weinv.enums.ErrorKey.*;
-import static com.mainthreadlab.weinv.enums.EventType.WEDDING;
+import static com.mainthreadlab.weinv.model.enums.ErrorKey.*;
+import static com.mainthreadlab.weinv.model.enums.EventType.WEDDING;
 import static com.mainthreadlab.weinv.commons.Utils.isSourceDateBeforeTargetDate;
 
 @Slf4j

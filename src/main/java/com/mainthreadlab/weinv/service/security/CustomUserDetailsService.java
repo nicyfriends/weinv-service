@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.mainthreadlab.weinv.enums.ErrorKey.*;
+import static com.mainthreadlab.weinv.model.enums.ErrorKey.*;
 
 @Slf4j
 @Service

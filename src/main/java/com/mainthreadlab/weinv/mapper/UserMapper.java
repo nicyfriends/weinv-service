@@ -1,8 +1,8 @@
 package com.mainthreadlab.weinv.mapper;
 
 import com.mainthreadlab.weinv.model.User;
-import com.mainthreadlab.weinv.enums.Language;
-import com.mainthreadlab.weinv.enums.Role;
+import com.mainthreadlab.weinv.model.enums.Language;
+import com.mainthreadlab.weinv.model.enums.Role;
 import com.mainthreadlab.weinv.dto.request.UserRequest;
 import com.mainthreadlab.weinv.dto.response.UserResponse;
 import com.mainthreadlab.weinv.dto.security.AuthUserRequest;

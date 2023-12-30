@@ -4,9 +4,9 @@ import com.mainthreadlab.weinv.config.security.annotation.JwtDetails;
 import com.mainthreadlab.weinv.config.security.annotation.JwtUserClaims;
 import com.mainthreadlab.weinv.dto.request.UpdateUserRequest;
 import com.mainthreadlab.weinv.dto.request.UserRequest;
+import com.mainthreadlab.weinv.dto.response.ErrorResponse;
 import com.mainthreadlab.weinv.dto.response.UserResponse;
 import com.mainthreadlab.weinv.service.UserService;
-import com.mainthreadlab.weinv.dto.response.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,29 +32,28 @@ import java.net.URISyntaxException;
 @RequestMapping("/users")
 public class UserController {
 
+
+    private final UserService userService;
+
     @Autowired
-    private UserService userService;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
 
     @PostMapping("/register")
-    @Operation(
-            operationId = "registerWeddingResponsible",
-            summary = "Register a responsible for an event (only 'admin' can do that)",
-            tags = {"User"},
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)), headers = @Header(name = HttpHeaders.LOCATION, schema = @Schema(implementation = URI.class))),
-                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "409", description = "Conflict", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-            }
-    )
+    @Operation(operationId = "registerWeddingResponsible", summary = "Register a responsible for an event (only 'admin' can do that)", tags = {"User"}, responses = {
+            @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)), headers = @Header(name = HttpHeaders.LOCATION, schema = @Schema(implementation = URI.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Conflict", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     public ResponseEntity<Void> registerWeddingResponsible(
             @Valid @RequestBody UserRequest userRequest,
             @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) throws IOException, URISyntaxException {
 
-        log.info("[RegisterWeddingResponsible] request: {}", request.getRequestURI());
+        log.info("[registerWeddingResponsible] - request: {}", request.getRequestURI());
         String uuid = userService.registerWeddingResponsible(jwtDetails, userRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{uuid}").buildAndExpand(uuid).toUri();
         return ResponseEntity.created(location).build();

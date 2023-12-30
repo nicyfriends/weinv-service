@@ -1,4 +1,4 @@
-package com.mainthreadlab.weinv.enums;
+package com.mainthreadlab.weinv.model.enums;
 
 import lombok.Getter;
 
@@ -9,10 +9,10 @@ public enum Role {
     USER("user"),      // it can create users of type 'guest'
     GUEST("guest");
 
-    private final String name;
+    private final String description;
 
-    Role(String name) {
-        this.name = name;
+    Role(String description) {
+        this.description = description;
     }
 
 }

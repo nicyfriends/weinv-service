@@ -1,6 +1,6 @@
 package com.mainthreadlab.weinv.exception;
 
-import com.mainthreadlab.weinv.enums.ErrorKey;
+import com.mainthreadlab.weinv.model.enums.ErrorKey;
 
 public class BadCredentialsException extends org.springframework.security.authentication.BadCredentialsException {
 

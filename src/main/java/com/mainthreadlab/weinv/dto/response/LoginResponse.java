@@ -1,7 +1,7 @@
 package com.mainthreadlab.weinv.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mainthreadlab.weinv.enums.EventType;
+import com.mainthreadlab.weinv.model.enums.EventType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.mainthreadlab.weinv.enums;
+package com.mainthreadlab.weinv.model.enums;
 
 import lombok.Getter;
 

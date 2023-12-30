@@ -1,12 +1,10 @@
 package com.mainthreadlab.weinv.dto.response;
 
-import com.mainthreadlab.weinv.enums.EventType;
-import com.mainthreadlab.weinv.enums.WeddingType;
+import com.mainthreadlab.weinv.model.enums.EventType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Getter

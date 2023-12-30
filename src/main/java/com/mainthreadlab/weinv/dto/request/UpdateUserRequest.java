@@ -1,6 +1,6 @@
 package com.mainthreadlab.weinv.dto.request;
 
-import com.mainthreadlab.weinv.enums.Language;
+import com.mainthreadlab.weinv.model.enums.Language;
 import lombok.Data;
 
 import javax.validation.constraints.Email;

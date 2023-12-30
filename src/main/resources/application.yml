@@ -126,7 +126,7 @@ weinv:
     clients: "https://weinv-service.cleverapps.io/weinv/clients"
 
   client-id: "weinv"
-  client-secret: "WEINV.ClientSecret1@"
+  client-secret: "weinv1@client.secret"
 
   httpClient:
     timeout: 20000

@@ -1,6 +1,6 @@
 package com.mainthreadlab.weinv.dto.response;
 
-import com.mainthreadlab.weinv.enums.EventType;
+import com.mainthreadlab.weinv.model.enums.EventType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
