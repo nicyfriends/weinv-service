@@ -39,7 +39,7 @@
 		<org.lombok.version>1.18.30</org.lombok.version>
 		<org.springdoc.version>1.6.6</org.springdoc.version>
 		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
-		<maven.compiler.plugin.version>3.12.0</maven.compiler.plugin.version>
+		<maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
 		<org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
 		<googlecode.libphonenumber.version>8.12.16</googlecode.libphonenumber.version>
 		<spring.security.oauth2.autoconfigure.version>2.3.3.RELEASE</spring.security.oauth2.autoconfigure.version>
