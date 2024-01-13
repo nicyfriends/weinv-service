@@ -36,9 +36,10 @@ public class UserRequest {
 
     @ToString.Exclude
     @NotBlank(message = "must not be empty or null")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$",
-            message = "Password must contain at least one lowercase, uppercase, digit or symbols character" +
-                    "and must be at least 8 characters in length")
+//    @Pattern(regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,20}$",
+//            message = "Password must contain at least one lowercase, uppercase, digit or symbols character" +
+//                    "and must be at least 8 characters in length")
+    @Pattern(regexp = "^(?=.*[a-zA-Z]).{8,20}$", message = "Password must contain at least 8 characters in length")
     private String password;
 
     private Language language;
