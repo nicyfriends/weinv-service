@@ -236,6 +236,8 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isBlank(userRequest.getPhoneNumber())) {
             userRequest.setPhoneNumber("+243");  // default country code
         }
+        userRequest.setUsername(userRequest.getUsername().trim().toLowerCase());
+        userRequest.setPassword(userRequest.getPassword().trim().toLowerCase());
         return userRepository.save(userMapper.toEntity(userRequest));
     }
 
