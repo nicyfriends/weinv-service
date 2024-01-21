@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
     private final WeddingRepository weddingRepository;
     private final WeddingGuestRepository weddingGuestRepository;
     private final ObjectMapper objectMapper;
-    private final UserMapper userMapper;
+    private final UserMapper mapper;
     private final EmailService emailSender;
     private final CustomUserDetailsService customUserDetailsService;
 
@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
             loginResponse.setFirstName(user.getFirstName());
             loginResponse.setLastName(user.getLastName());
             loginResponse.setEventType(user.getEventType());
-            List<String> roles = Arrays.stream(user.getRoles().split(",")).map(userMapper::mapRole).toList();
+            List<String> roles = Arrays.stream(user.getRoles().split(",")).map(mapper::mapRole).toList();
             loginResponse.setRoles(roles);
             user.setLastLoginDate(new Date());
 
@@ -182,7 +182,7 @@ public class UserServiceImpl implements UserService {
         User user = save(userRequest);
 
         log.info("[registerWeddingResponsible] - save in authorization-server");
-        AuthUserRequest authUserRequest = userMapper.toAuthUser(userRequest);
+        AuthUserRequest authUserRequest = mapper.toAuthUser(userRequest);
         customUserDetailsService.addUserDetails(authUserRequest);
 
         String template = Utils.readFileFromResource(enAccountCreationBodyFilePath);
@@ -230,7 +230,7 @@ public class UserServiceImpl implements UserService {
     public User save(UserRequest userRequest) {
         User user = userRepository.findByUsername(userRequest.getUsername());
         if (user != null) {
-            log.error("[save] - User already exists, uuid={}", userRequest.getUsername());
+            log.error("[save] - user already exists, uuid={}", userRequest.getUsername());
             throw new UniqueConstraintViolationException(USER_ALREADY_EXISTS);
         }
         if (StringUtils.isBlank(userRequest.getPhoneNumber())) {
@@ -238,7 +238,7 @@ public class UserServiceImpl implements UserService {
         }
         userRequest.setUsername(userRequest.getUsername().trim().toLowerCase());
         userRequest.setPassword(userRequest.getPassword().trim().toLowerCase());
-        return userRepository.save(userMapper.toEntity(userRequest));
+        return userRepository.save(mapper.toEntity(userRequest));
     }
 
     @Override
@@ -249,14 +249,13 @@ public class UserServiceImpl implements UserService {
         UserResponse userResponse = null;
         User user = getByUuid(uuid);
         if (user != null) {
-            userResponse = userMapper.toModel(user);
+            userResponse = mapper.toModel(user);
             WeddingGuest weddingGuest = weddingGuestRepository.findByGuest(user);
             if (weddingGuest != null) {
                 userResponse.setTableNumber(weddingGuest.getTableNumber());
             }
         }
 
-        log.info("[GetUser] - success: {}", userResponse != null ? userResponse.toString() : null);
         log.info("[GetUser] - end");
         return userResponse;
 
@@ -272,14 +271,11 @@ public class UserServiceImpl implements UserService {
     public void updateUser(String uuid, String uuidWedding, UpdateUserRequest updateUserRequest) {
 
         String uuidFinal = StringUtils.isNotBlank(updateUserRequest.getUuid()) ? updateUserRequest.getUuid() : uuid;
-        log.info("[UpdateUser] - start: uuid={}", uuidFinal);
-
-        updateUserRequest.setFirstName(StringUtils.capitalize(updateUserRequest.getFirstName()));
-        updateUserRequest.setLastName(StringUtils.capitalize(updateUserRequest.getLastName()));
+        log.info("[update user] - start: uuid={}", uuidFinal);
 
         User user = getByUuid(uuidFinal);
         if (user == null) {
-            log.error("[UpdateUser] - User not found, uuid={}", uuidFinal);
+            log.error("[update user] - user not found, uuid={}", uuidFinal);
             throw new ResourceNotFoundException(USER_NOT_FOUND);
         }
 
@@ -293,28 +289,26 @@ public class UserServiceImpl implements UserService {
                 }
             }
         }
-        updateUserFromAuthzServer(updateUserRequest, user);
+        processUpdate(updateUserRequest, user);
 
-        log.info("[UpdateUser] - success");
-        log.info("[UpdateUser] - end");
-
+        log.info("[update user] - end");
     }
 
-    private void updateUserFromAuthzServer(UpdateUserRequest updateUserRequest, User user) {
-        AuthUpdateUserRequest authUpdateUserRequest = new AuthUpdateUserRequest();
-        authUpdateUserRequest.setUsername(user.getUsername());
-        authUpdateUserRequest.setCurrentPassword(updateUserRequest.getCurrentPassword());
-        authUpdateUserRequest.setNewPassword(updateUserRequest.getNewPassword());
-
+    private void processUpdate(UpdateUserRequest updateUserRequest, User user) {
         if (StringUtils.isNotBlank(updateUserRequest.getEmail())) {
             user.setEmail(updateUserRequest.getEmail());
-            authUpdateUserRequest.setEmail(updateUserRequest.getEmail());
         }
         if (StringUtils.isNotBlank(updateUserRequest.getFirstName())) {
-            user.setFirstName(updateUserRequest.getFirstName());
+            user.setFirstName(StringUtils.capitalize(updateUserRequest.getFirstName()));
         }
         if (StringUtils.isNotBlank(updateUserRequest.getLastName())) {
-            user.setLastName(updateUserRequest.getLastName());
+            user.setLastName(StringUtils.capitalize(updateUserRequest.getLastName()));
+        }
+        if (StringUtils.isNotBlank(updateUserRequest.getHusband())) {
+            user.setHusband(StringUtils.capitalize(updateUserRequest.getHusband()));
+        }
+        if (StringUtils.isNotBlank(updateUserRequest.getWife())) {
+            user.setWife(StringUtils.capitalize(updateUserRequest.getWife()));
         }
         if (StringUtils.isNotBlank(updateUserRequest.getPhoneNumber())) {
             user.setPhoneNumber(updateUserRequest.getPhoneNumber());
@@ -322,9 +316,10 @@ public class UserServiceImpl implements UserService {
         if (updateUserRequest.getLanguage() != null) {
             user.setLanguage(updateUserRequest.getLanguage());
         }
+        user.setCouple(updateUserRequest.isCouple());
 
-        log.info("[UpdateUser] - (weinv > authorization-server)");
-        customUserDetailsService.updateUser(authUpdateUserRequest);
+        log.info("[update user] - (weinv > authorization-server)");
+        customUserDetailsService.updateUser(mapper.map(updateUserRequest));
     }
 
 }

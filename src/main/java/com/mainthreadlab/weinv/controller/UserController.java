@@ -104,7 +104,7 @@ public class UserController {
             @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) throws URISyntaxException {
 
-        log.info("[UpdateUser] request: {}", request.getRequestURI());
+        log.info("[update user] request: {}", request.getRequestURI());
         userService.updateUser(uuid, uuidWedding, updateUserRequest);
         return ResponseEntity.ok().build();
     }

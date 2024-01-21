@@ -40,8 +40,13 @@ import java.util.List;
 @RequestMapping("/weddings")
 public class WeddingController {
 
+    
+    private final WeddingService weddingService;
+
     @Autowired
-    private WeddingService weddingService;
+    public WeddingController(WeddingService weddingService) {
+        this.weddingService = weddingService;
+    }
 
 
     @PostMapping()
@@ -59,10 +64,9 @@ public class WeddingController {
     )
     public ResponseEntity<String> createWedding(
             @Valid @RequestBody WeddingRequest weddingRequest,
-            @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) {
 
-        log.info("[CreateWedding] request: {}", request.getRequestURI());
+        log.info("[create wedding] - request: {}", request.getRequestURI());
         String uuid = weddingService.createWedding(weddingRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{uuid}").buildAndExpand(uuid).toUri();
         return ResponseEntity.created(location).body(uuid);
@@ -85,10 +89,9 @@ public class WeddingController {
     public ResponseEntity<Void> invite(
             @Valid @RequestBody UserRequest userRequest,
             @PathVariable String uuid,
-            @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) throws URISyntaxException, IOException {
 
-        log.info("[Invite] request: {}", request.getRequestURI());
+        log.info("[invite] - request: {}", request.getRequestURI());
         weddingService.invite(uuid, userRequest);
         return ResponseEntity.ok().build();
     }
@@ -110,10 +113,9 @@ public class WeddingController {
             @PathVariable("uuid") String uuidWedding,
             @RequestParam("guest") String uuidGuest,
             @Valid @RequestBody ConfirmRequest confirmRequest,
-            @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) {
 
-        log.info("[ConfirmInvitation] request: {}", request.getRequestURI());
+        log.info("[confirm invitation] - request: {}", request.getRequestURI());
         weddingService.confirmInvitation(confirmRequest, uuidWedding, uuidGuest);
         return ResponseEntity.ok().build();
     }
@@ -134,10 +136,9 @@ public class WeddingController {
     )
     public ResponseEntity<WeddingResponse> getWedding(
             @PathVariable String uuid,
-            @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) {
 
-        log.info("[GetWedding] request: {}", request.getRequestURI());
+        log.info("[get wedding] - request: {}", request.getRequestURI());
         WeddingResponse weddingResponse = weddingService.getWedding(uuid);
         return ResponseEntity.ok().body(weddingResponse);
     }
@@ -161,10 +162,9 @@ public class WeddingController {
             @RequestParam(required = false, defaultValue = "0") int offset,
             @RequestParam(required = false, defaultValue = "5") int limit,
             @RequestParam(required = false, defaultValue = "guest.firstName:ASC") String sortingKeys,
-            @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) {
 
-        log.info("[GetWeddingInvitations] request: {}", request.getRequestURI());
+        log.info("[get wedding invitations] - request: {}", request.getRequestURI());
         Page<InvitationResponse> invitationsResponse = weddingService.getWeddingInvitations(uuid, searchKeyword, Pagination.toPageable(offset, limit, sortingKeys));
         return ResponseEntity.ok().body(invitationsResponse);
     }
@@ -187,7 +187,7 @@ public class WeddingController {
             @RequestParam(required = false, defaultValue = "date:DESC") String sortingKeys,
             HttpServletRequest request) {
 
-        log.info("[GetWeddings] request: {}", request.getRequestURI());
+        log.info("[get weddings] - request: {}", request.getRequestURI());
         List<WeddingResponse> response = weddingService.getWeddings(Pagination.toPageable(offset, limit, sortingKeys));
         return ResponseEntity.ok().body(response);
     }
@@ -211,7 +211,7 @@ public class WeddingController {
             @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) {
 
-        log.info("[UpdateWedding] request: {}", request.getRequestURI());
+        log.info("[update wedding] - request: {}", request.getRequestURI());
         weddingService.updateWedding(uuid, weddingRequest, jwtDetails);
         return ResponseEntity.ok().build();
     }
@@ -231,10 +231,9 @@ public class WeddingController {
     )
     public ResponseEntity<Void> deleteWedding(
             @PathVariable String uuid,
-            @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) {
 
-        log.info("[DeleteWedding] request: {}", request.getRequestURI());
+        log.info("[delete wedding] - request: {}", request.getRequestURI());
         weddingService.deleteWedding(uuid);
         return ResponseEntity.ok().build();
     }
@@ -254,10 +253,9 @@ public class WeddingController {
     )
     public void downloadPdf(
             @PathVariable String uuid,
-            @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request, HttpServletResponse httpResponse) throws DocumentException, IOException {
 
-        log.info("[DownloadPdf] request: {}", request.getRequestURI());
+        log.info("[download pdf] - request: {}", request.getRequestURI());
 
         httpResponse.setContentType("application/pdf");
         httpResponse.setHeader("Content-disposition", "attachment; filename=invités.pdf");

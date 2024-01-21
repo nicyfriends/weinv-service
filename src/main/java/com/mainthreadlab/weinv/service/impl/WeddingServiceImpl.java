@@ -4,6 +4,7 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.mainthreadlab.weinv.commons.Utils;
 import com.mainthreadlab.weinv.config.security.annotation.JwtDetails;
 import com.mainthreadlab.weinv.dto.request.ConfirmRequest;
 import com.mainthreadlab.weinv.dto.request.UserRequest;
@@ -12,8 +13,6 @@ import com.mainthreadlab.weinv.dto.request.WeddingUpdateRequest;
 import com.mainthreadlab.weinv.dto.response.InvitationResponse;
 import com.mainthreadlab.weinv.dto.response.WeddingResponse;
 import com.mainthreadlab.weinv.dto.security.AuthUserRequest;
-import com.mainthreadlab.weinv.model.enums.Language;
-import com.mainthreadlab.weinv.model.enums.Role;
 import com.mainthreadlab.weinv.exception.BadRequestException;
 import com.mainthreadlab.weinv.exception.ResourceNotFoundException;
 import com.mainthreadlab.weinv.mapper.UserMapper;
@@ -22,13 +21,14 @@ import com.mainthreadlab.weinv.mapper.WeddingMapper;
 import com.mainthreadlab.weinv.model.User;
 import com.mainthreadlab.weinv.model.Wedding;
 import com.mainthreadlab.weinv.model.WeddingGuest;
+import com.mainthreadlab.weinv.model.enums.Language;
+import com.mainthreadlab.weinv.model.enums.Role;
 import com.mainthreadlab.weinv.repository.WeddingGuestRepository;
 import com.mainthreadlab.weinv.repository.WeddingRepository;
 import com.mainthreadlab.weinv.service.EmailService;
 import com.mainthreadlab.weinv.service.UserService;
 import com.mainthreadlab.weinv.service.WeddingService;
 import com.mainthreadlab.weinv.service.security.CustomUserDetailsService;
-import com.mainthreadlab.weinv.commons.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -45,11 +45,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
+import static com.mainthreadlab.weinv.commons.Constants.*;
+import static com.mainthreadlab.weinv.commons.Utils.isSourceDateBeforeTargetDate;
 import static com.mainthreadlab.weinv.model.enums.ErrorKey.*;
 import static com.mainthreadlab.weinv.model.enums.EventType.WEDDING;
-import static com.mainthreadlab.weinv.commons.Utils.isSourceDateBeforeTargetDate;
 
 @Slf4j
 @Service
@@ -57,7 +57,6 @@ import static com.mainthreadlab.weinv.commons.Utils.isSourceDateBeforeTargetDate
 @RequiredArgsConstructor
 public class WeddingServiceImpl implements WeddingService {
 
-    private static final String GUEST_FIELD = "guest";
     private final WeddingRepository weddingRepository;
     private final WeddingGuestRepository weddingGuestRepository;
     private final UserService userService;
@@ -83,10 +82,10 @@ public class WeddingServiceImpl implements WeddingService {
     @Override
     public String createWedding(WeddingRequest weddingRequest) {
 
-        log.info("[CreateWedding] - start: {}", weddingRequest.toString());
+        log.info("[create wedding] - start: {}", weddingRequest.toString());
 
         if (weddingRequest.getDate() != null && isSourceDateBeforeTargetDate(weddingRequest.getDate(), new Date())) {
-            log.error("[CreateWedding] - Wedding date must not be before the current date");
+            log.error("[create wedding] - wedding date must not be before the current date");
             throw new BadRequestException(INVALID_WEDDING_DATE);
         }
 
@@ -95,14 +94,14 @@ public class WeddingServiceImpl implements WeddingService {
 
         User responsible = userService.getByUuid(weddingRequest.getResponsibleUUID());
         if (responsible == null) {
-            log.error("[CreateWedding] - Wedding responsible not found, uuid = {}", weddingRequest.getResponsibleUUID());
+            log.error("[create wedding] - wedding responsible not found, uuid = {}", weddingRequest.getResponsibleUUID());
             throw new ResourceNotFoundException(WEDDING_RESPONSIBLE_NOT_FOUND);
         }
 
         //control if the user is responsible for another wedding
         Wedding wedding = getByResponsible(responsible);
         if (wedding != null) {
-            log.error("[CreateWedding] - User {} is already responsible for another wedding", responsible.getUsername());
+            log.error("[create wedding] - user {} is already responsible for another wedding", responsible.getUsername());
             throw new BadRequestException(USER_ALREADY_RESPONSIBLE);
         }
 
@@ -111,8 +110,7 @@ public class WeddingServiceImpl implements WeddingService {
         wedding.setEventType(responsible.getEventType());
         wedding = weddingRepository.save(wedding);
 
-        log.info("[CreateWedding] - success: uuid={}", wedding.getUuid());
-        log.info("[CreateWedding] - end");
+        log.info("[create wedding] - end");
         return wedding.getUuid();
 
     }
@@ -122,18 +120,18 @@ public class WeddingServiceImpl implements WeddingService {
     @Transactional
     public void invite(String uuid, UserRequest userRequest) {
 
-        log.info("[Invite] - start: {}", userRequest.toString());
+        log.info("[invite] - start: {}", userRequest.toString());
 
         Wedding wedding = getByUuid(uuid);
         if (wedding == null) {
-            log.error("[Invite] - Wedding not found, uuid = {}", uuid);
+            log.error("[invite] - wedding not found, uuid = {}", uuid);
             throw new ResourceNotFoundException(WEDDING_NOT_FOUND);
         }
 
         if (Objects.nonNull(wedding.getMaxInvitations())) {
             int invitationsAlreadySent = weddingGuestRepository.findByWeddingOrderByGuest_FirstNameAscGuest_LastNameAsc(wedding).size();
             if (wedding.getMaxInvitations() == invitationsAlreadySent) {
-                log.error("[Invite] - Maximum number of invitations reached, uuid = {}", uuid);
+                log.error("[invite] - maximum number of invitations reached, uuid = {}", uuid);
                 throw new BadRequestException(MAX_INVITATION_NUMBER_REACHED);
             }
         }
@@ -141,9 +139,8 @@ public class WeddingServiceImpl implements WeddingService {
         if (Objects.nonNull(userRequest.getTableNumber()) &&
                 Objects.nonNull(wedding.getMaxTables()) &&
                 (userRequest.getTableNumber() > wedding.getMaxTables())) {
-            log.error("[Invite] - Table number incorrect, uuid = {}", uuid);
+            log.error("[invite] - table number incorrect, uuid = {}", uuid);
             throw new BadRequestException(INCORRECT_TABLE_NUMBER);
-
         }
 
         userRequest.setRole(Role.GUEST);
@@ -152,22 +149,20 @@ public class WeddingServiceImpl implements WeddingService {
 
         weddingGuestRepository.save(weddingGuestMapper.toEntity(wedding, user, userRequest.getTableNumber()));
 
-        log.info("[Invite] - save in authorization-server");
+        log.info("[invite] - save in authorization-server");
         AuthUserRequest authUserRequest = userMapper.toAuthUser(userRequest);
         customUserDetailsService.addUserDetails(authUserRequest);
 
-        log.info("[Invite] - sending invitation mail...");
+        log.info("[invite] - sending invitation mail...");
         sendMail(wedding, userRequest);
 
-        log.info("[Invite] - success: username={}", userRequest.getUsername());
-        log.info("[Invite] - end");
-
+        log.info("[invite] - end");
     }
 
     @Override
     public WeddingResponse getWedding(String uuid) {
 
-        log.info("[GetWedding] - start: uuid={}", uuid);
+        log.info("[get wedding] - start: uuid={}", uuid);
 
         WeddingResponse response = null;
         Wedding wedding = getByUuid(uuid);
@@ -176,8 +171,7 @@ public class WeddingServiceImpl implements WeddingService {
             response = weddingMapper.toModel(wedding, weddingGuestList.size());
         }
 
-        log.info("[GetWedding] - success: uuid={}", wedding != null ? wedding.getUuid() : null);
-        log.info("[GetWedding] - end");
+        log.info("[get wedding] - end");
         return response;
 
     }
@@ -186,7 +180,7 @@ public class WeddingServiceImpl implements WeddingService {
     @Override
     public Page<InvitationResponse> getWeddingInvitations(String uuidWedding, String searchKeyword, Pageable pageable) {
 
-        log.info("[GetWeddingInvitations] - start: uuidWedding={}", uuidWedding);
+        log.info("[get wedding invitations] - start: uuidWedding={}", uuidWedding);
 
         Specification<WeddingGuest> specification = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -205,8 +199,8 @@ public class WeddingServiceImpl implements WeddingService {
         };
         Page<WeddingGuest> weddingGuestList = weddingGuestRepository.findAll(specification, pageable);
 
-        log.info("[GetWeddingInvitations] - success: {} element(s) found", weddingGuestList.getSize());
-        log.info("[GetWeddingInvitations] - end");
+        log.info("[get wedding invitations] - found {} element(s)", weddingGuestList.getSize());
+        log.info("[get wedding invitations] - end");
 
         return weddingGuestList.map(weddingGuestMapper::toInvitation);
 
@@ -216,19 +210,19 @@ public class WeddingServiceImpl implements WeddingService {
     @Override
     public List<WeddingResponse> getWeddings(Pageable pageable) {
 
-        log.info("[GetWeddings] - start");
+        log.info("[get weddings] - start");
 
         Page<Wedding> pageWeddings = weddingRepository.findAll(pageable);
         List<WeddingResponse> response = pageWeddings
                 .stream()
                 .map(w -> weddingMapper.toModel(w, weddingGuestRepository.findByWedding(w).size()))
-                .collect(Collectors.toList());
+                .toList();
 
         // remove unnecessary data (QoS)
         response.forEach(w -> w.setSpousesImage(null));
 
-        log.info("[GetWeddings] - success: {} element(s) found", response.size());
-        log.info("[GetWeddings] - end");
+        log.info("[get weddings] - found {} element(s)", response.size());
+        log.info("[get weddings] - end");
         return response;
 
     }
@@ -237,10 +231,10 @@ public class WeddingServiceImpl implements WeddingService {
     @Transactional
     public void updateWedding(String uuid, WeddingUpdateRequest weddingUpdateRequest, JwtDetails jwtDetails) {
 
-        log.info("[UpdateWedding] - start: uuid={}", uuid);
+        log.info("[update wedding] - start: uuid={}", uuid);
 
         if (weddingUpdateRequest.getDate() != null && isSourceDateBeforeTargetDate(weddingUpdateRequest.getDate(), new Date())) {
-            log.error("[UpdateWedding] - Wedding date must not be before the current date");
+            log.error("[update wedding] - wedding date must not be before the current date");
             throw new BadRequestException(INVALID_WEDDING_DATE);
         }
 
@@ -253,13 +247,13 @@ public class WeddingServiceImpl implements WeddingService {
 
         Wedding wedding = weddingRepository.findByUuid(uuid);
         if (wedding == null) {
-            log.error("[UpdateWedding] - Wedding not found, uuid = {}", uuid);
+            log.error("[update wedding] - wedding not found, uuid = {}", uuid);
             throw new ResourceNotFoundException(WEDDING_NOT_FOUND);
         }
 
         User responsible = userService.getByUuid(weddingUpdateRequest.getResponsibleUUID());
         if (responsible == null) {
-            log.error("[UpdateWedding] - Wedding responsible not found, uuid = {}", weddingUpdateRequest.getResponsibleUUID());
+            log.error("[update wedding] - wedding responsible not found, uuid = {}", weddingUpdateRequest.getResponsibleUUID());
             throw new ResourceNotFoundException(WEDDING_RESPONSIBLE_NOT_FOUND);
         }
 
@@ -267,8 +261,7 @@ public class WeddingServiceImpl implements WeddingService {
         this.responsiblePwdRecovery(weddingUpdateRequest, jwtDetails, responsible);
         this.updateWedding(wedding, responsible, weddingUpdateRequest);
 
-        log.info("[UpdateWedding] - success: uuid={}", uuid);
-        log.info("[UpdateWedding] - end");
+        log.info("[update wedding] - end");
 
     }
 
@@ -298,13 +291,13 @@ public class WeddingServiceImpl implements WeddingService {
 
     @Override
     public void deleteWedding(String uuidWedding) {
-        log.info("[DeleteWedding] - start: uuid={}", uuidWedding);
+        log.info("[delete wedding] - start: uuid={}", uuidWedding);
 
         Wedding wedding = getByUuid(uuidWedding);
         if (wedding == null) {
             wedding = weddingRepository.findByUuid(uuidWedding);   // admin: delete (no matters date)
             if (wedding == null) {
-                log.error("[DeleteWedding] - Wedding not found, uuid = {}", uuidWedding);
+                log.error("[delete wedding] - wedding not found, uuid = {}", uuidWedding);
                 throw new ResourceNotFoundException(WEDDING_NOT_FOUND);
             }
         }
@@ -314,31 +307,30 @@ public class WeddingServiceImpl implements WeddingService {
         userService.deleteUser(wedding.getResponsible().getUuid(), uuidWedding);   // delete responsible
         weddingRepository.delete(wedding);   // delete wedding
 
-        log.info("[DeleteWedding] - success: uuid={}", uuidWedding);
-        log.info("[DeleteWedding] - end");
+        log.info("[delete wedding] - end");
 
     }
 
     @Override
     public void confirmInvitation(ConfirmRequest confirmRequest, String uuidWedding, String uuidGuest) {
 
-        log.info("[ConfirmInvitation] - start: uuidWedding={}, uuiGuest={}", uuidWedding, uuidGuest);
+        log.info("[confirm invitation] - start: uuidWedding={}, uuiGuest={}", uuidWedding, uuidGuest);
 
         Wedding wedding = getByUuid(uuidWedding);
         if (wedding == null) {
-            log.error("[ConfirmInvitation] - Wedding not found, uuid = {}", uuidWedding);
+            log.error("[confirm invitation] - wedding not found, uuid = {}", uuidWedding);
             throw new ResourceNotFoundException(WEDDING_NOT_FOUND);
         }
 
         User guest = userService.getByUuid(uuidGuest);
         if (guest == null) {
-            log.error("[ConfirmInvitation] - User not found, uuid = {}", uuidGuest);
+            log.error("[confirm invitation] - user not found, uuid = {}", uuidGuest);
             throw new ResourceNotFoundException(USER_ALREADY_RESPONSIBLE);
         }
 
         WeddingGuest weddingGuest = weddingGuestRepository.findByWeddingAndGuest(wedding, guest);
         if (weddingGuest == null) {
-            log.error("[ConfirmInvitation] - Invitation not found, uuidWedding={}, uuiGuest={}", uuidWedding, uuidWedding);
+            log.error("[confirm invitation] - invitation not found, uuidWedding={}, uuiGuest={}", uuidWedding, uuidWedding);
             throw new ResourceNotFoundException(INVITATION_NOT_FOUND);
         }
 
@@ -350,24 +342,20 @@ public class WeddingServiceImpl implements WeddingService {
             weddingGuest.setConfirmed(false);
         }
 
-        log.info("[ConfirmInvitation] - success");
-        log.info("[ConfirmInvitation] - end");
-
+        log.info("[confirm invitation] - end");
     }
 
     /**
      * return pdf file that contains list of guests of a wedding
-     *
-     * @return
      */
     @Override
     public void downloadPdf(String uuidWedding, HttpServletResponse httpResponse) throws DocumentException, IOException {
 
-        log.info("[DownloadPdf] - start: uuidWedding={}", uuidWedding);
+        log.info("[download pdf] - start: uuidWedding={}", uuidWedding);
 
         Wedding wedding = getByUuid(uuidWedding);
         if (wedding == null) {
-            log.error("[ConfirmInvitation] - Wedding not found, uuid = {}", uuidWedding);
+            log.error("[confirm invitation] - Wedding not found, uuid = {}", uuidWedding);
             throw new ResourceNotFoundException(WEDDING_NOT_FOUND);
         }
 
@@ -384,8 +372,7 @@ public class WeddingServiceImpl implements WeddingService {
         document.add(table);
         document.close();
 
-        log.info("[DownloadPdf] - success");
-        log.info("[DownloadPdf] - end");
+        log.info("[download pdf] - end");
 
     }
 
@@ -433,7 +420,7 @@ public class WeddingServiceImpl implements WeddingService {
         pdfPCell.setPadding(20.0f);
         table.addCell(pdfPCell);
 
-        List<String> columns = Arrays.asList("Nom", "Table No", "Confirmé", "Rejeté");
+        List<String> columns = Arrays.asList(NOM, TABLE_NO, CONFIRMED, REJECTED_FR);
         String maxSeatsTitle = "Nombre d'invitations: ";
         String seatsTaken = "Invitations envoyées: ";
         String seatsAvailableTitle = "Invitations disponibiles: ";
@@ -444,7 +431,7 @@ public class WeddingServiceImpl implements WeddingService {
             maxTables = "Number of tables: ";
             seatsTaken = "Invitations sent: ";
             seatsAvailableTitle = "Invitations available: ";
-            columns = Arrays.asList("Name", "Table No", "Confirmed", "Rejected");
+            columns = Arrays.asList("Name", TABLE_NO, "Confirmed", "Rejected");
         }
 
         // seats information

@@ -119,10 +119,10 @@ public class CustomUserDetailsService extends JdbcDaoImpl {
 
     @Transactional
     public void updateUser(AuthUpdateUserRequest authUpdateUserRequest) {
-        logger.info("AUTHORIZATION-SERVER > [updateUser] - start");
+        logger.info("AUTHORIZATION-SERVER > [update user] - start");
         UserAuth user = customUserDetailsRepository.findByUsername(authUpdateUserRequest.getUsername());
         if (user == null) {
-            log.error("AUTHORIZATION-SERVER > [updateUser] - user not found, username={}", authUpdateUserRequest.getUsername());
+            log.error("AUTHORIZATION-SERVER > [update user] - user not found, username={}", authUpdateUserRequest.getUsername());
             throw new ResourceNotFoundException(USER_NOT_FOUND);
         }
 
@@ -130,7 +130,7 @@ public class CustomUserDetailsService extends JdbcDaoImpl {
         String newPassword = authUpdateUserRequest.getNewPassword();
         if (StringUtils.isNotBlank(currentPassword) && StringUtils.isNotBlank(newPassword)) {
             if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-                log.error("AUTHORIZATION-SERVER > [updateUser] - wrong password, username={}", authUpdateUserRequest.getUsername());
+                log.error("AUTHORIZATION-SERVER > [update user] - wrong password, username={}", authUpdateUserRequest.getUsername());
                 throw new BadCredentialsException(WRONG_PASSWORD);
             }
             user.setPassword(passwordEncoder.encode(newPassword));
@@ -140,7 +140,7 @@ public class CustomUserDetailsService extends JdbcDaoImpl {
             user.setEmail(authUpdateUserRequest.getEmail());
         }
 
-        logger.info("AUTHORIZATION-SERVER > [updateUser] - success");
+        logger.info("AUTHORIZATION-SERVER > [update user] - success");
     }
 
 

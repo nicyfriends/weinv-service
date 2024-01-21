@@ -1,12 +1,15 @@
 package com.mainthreadlab.weinv.mapper;
 
+import com.mainthreadlab.weinv.dto.request.UpdateUserRequest;
 import com.mainthreadlab.weinv.dto.request.UserRequest;
 import com.mainthreadlab.weinv.dto.response.UserResponse;
+import com.mainthreadlab.weinv.dto.security.AuthUpdateUserRequest;
 import com.mainthreadlab.weinv.dto.security.AuthUserRequest;
 import com.mainthreadlab.weinv.model.User;
 import com.mainthreadlab.weinv.model.enums.Language;
 import com.mainthreadlab.weinv.model.enums.Role;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.mapstruct.Mapper;
 
 import java.util.Arrays;
@@ -19,8 +22,6 @@ public interface UserMapper {
     default User toEntity(UserRequest userRequest) {
         User user = new User();
         user.setUuid(UUID.randomUUID().toString());
-        user.setFirstName(userRequest.getFirstName());
-        user.setLastName(userRequest.getLastName());
         user.setEmail(userRequest.getEmail());
         user.setPhoneNumber(userRequest.getPhoneNumber());
         user.setUsername(userRequest.getUsername());
@@ -28,23 +29,33 @@ public interface UserMapper {
         user.setLanguage(userRequest.getLanguage() != null ? userRequest.getLanguage() : Language.FR);
         user.setRoles(userRequest.getRole() != null ? userRequest.getRole().getDescription() : Role.GUEST.getDescription());
         user.setPrice(userRequest.getPrice());  // only for responsible
+        if (userRequest.isCouple()) {
+            user.setHusband(userRequest.getHusband());
+            user.setWife(userRequest.getWife());
+            user.setCouple(userRequest.isCouple());
+        } else {
+            user.setFirstName(userRequest.getFirstName());
+            user.setLastName(userRequest.getLastName());
+        }
         user.setEnabled(true);
         return user;
     }
 
     default UserResponse toModel(User user) {
-        UserResponse userResponse = new UserResponse();
-        userResponse.setFirstName(user.getFirstName());
-        userResponse.setLastName(user.getLastName());
-        userResponse.setLanguage(user.getLanguage().name());
-        userResponse.setEmail(user.getEmail());
-        userResponse.setPhoneNumber(user.getPhoneNumber());
-        userResponse.setUsername(user.getUsername());
-        userResponse.setUuid(user.getUuid());
-        userResponse.setEventType(user.getEventType());
         List<String> roles = Arrays.asList(user.getRoles().split(","));
-        userResponse.setRoles(roles.stream().map(this::mapRole).toList());
-        return userResponse;
+        return new UserResponse()
+                .setFirstName(user.getFirstName())
+                .setLastName(user.getLastName())
+                .setHusband(user.getHusband())
+                .setWife(user.getWife())
+                .setCouple(user.isCouple())
+                .setLanguage(user.getLanguage().name())
+                .setEmail(user.getEmail())
+                .setPhoneNumber(user.getPhoneNumber())
+                .setUsername(user.getUsername())
+                .setUuid(user.getUuid())
+                .setEventType(user.getEventType())
+                .setRoles(roles.stream().map(this::mapRole).toList());
     }
 
     // for UI
@@ -54,7 +65,7 @@ public interface UserMapper {
             else if (role.contains("guest")) return "G";
             else if (role.contains("admin")) return "A";
         }
-        return "";
+        return Strings.EMPTY;
     }
 
     default AuthUserRequest toAuthUser(UserRequest userRequest) {
@@ -66,4 +77,5 @@ public interface UserMapper {
         return authUserRequest;
     }
 
+    AuthUpdateUserRequest map(UpdateUserRequest updateUserRequest);
 }

@@ -16,6 +16,12 @@ public class UpdateUserRequest {
     private String lastName;           // both
 
     private String firstName;          // both
+    /**
+     * couple information
+     */
+    private String wife;             // for the guest
+    private String husband;          // for the guest
+    private boolean couple;          // for the guest
 
     private String phoneNumber;        // both
 

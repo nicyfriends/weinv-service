@@ -1,9 +1,9 @@
 package com.mainthreadlab.weinv.model;
 
 
+import com.mainthreadlab.weinv.model.base.BaseEntity;
 import com.mainthreadlab.weinv.model.enums.EventType;
 import com.mainthreadlab.weinv.model.enums.Language;
-import com.mainthreadlab.weinv.model.base.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -31,11 +31,18 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false, length = 20)
     private String username;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
+    // @Column(nullable = false)
     private String lastName;
+
+    /**
+     * couple information
+     */
+    private String wife;
+    private String husband;
+    private boolean couple;
 
     private String email;
 
@@ -63,6 +70,6 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private EventType eventType;  // for responsible
 
-    private boolean enabled = true;
+    private boolean enabled;
 
 }
