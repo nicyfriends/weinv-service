@@ -34,11 +34,15 @@ public interface WeddingGuestMapper {
         invitationResponse.setEmail(weddingGuest.getGuest().getEmail());
         invitationResponse.setFirstName(weddingGuest.getGuest().getFirstName());
         invitationResponse.setLastName(weddingGuest.getGuest().getLastName());
+        invitationResponse.setHusband(weddingGuest.getGuest().getHusband());
+        invitationResponse.setWife(weddingGuest.getGuest().getWife());
+        invitationResponse.setCouple(weddingGuest.getGuest().isCouple());
         invitationResponse.setPhoneNumber(weddingGuest.getGuest().getPhoneNumber());
         invitationResponse.setTableNumber(weddingGuest.getTableNumber());
         invitationResponse.setUsername(weddingGuest.getGuest().getUsername());
         invitationResponse.setUuid(weddingGuest.getGuest().getUuid());
         invitationResponse.setUuidWedding(weddingGuest.getWedding().getUuid());
+        invitationResponse.setEventType(weddingGuest.getGuest().getEventType());
         return invitationResponse;
     }
 }
