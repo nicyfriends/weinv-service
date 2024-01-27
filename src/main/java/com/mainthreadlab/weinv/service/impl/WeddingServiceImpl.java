@@ -394,7 +394,7 @@ public class WeddingServiceImpl implements WeddingService {
         for (Invitation wg : invitationList) {
             table.addCell(getRowPdfPCell(wg.getGuest().getFirstName() + " " + wg.getGuest().getLastName()));
             table.addCell(getRowPdfPCell(wg.getTableNumber() != null ? wg.getTableNumber().toString() : null));
-            table.addCell(getRowPdfPCell(wg.getStatus().name()));
+            table.addCell(getRowPdfPCell(wg.getStatus().getDescription()));
         }
     }
 
