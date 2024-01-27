@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
-public class WeddingGuestId implements Serializable {
+public class InvitationId implements Serializable {
 
     @Column(name = "wedding_uuid", nullable = false)
     private String weddingUuid;

@@ -1,32 +1,31 @@
 package com.mainthreadlab.weinv.dto.response;
 
+import com.mainthreadlab.weinv.model.enums.EventType;
+import com.mainthreadlab.weinv.model.enums.InvitationStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class InvitationResponse extends UserResponse {
+public class InvitationResponse {
 
-    private boolean confirmed;
-
-    private boolean rejected;
-
+    private String uuid;
+    private String username;
+    private String lastName;
+    private String firstName;
+    private String wife;
+    private String husband;
+    private boolean couple;
+    private String phoneNumber;
+    private String email;
+    private List<String> roles;
+    private Integer tableNumber;
+    private String language;
+    private EventType eventType;
+    private Integer totalInvitations;
+    private InvitationStatus status;
     private String uuidWedding;
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof InvitationResponse)) return false;
-        if (!super.equals(o)) return false;
-        InvitationResponse that = (InvitationResponse) o;
-        return confirmed == that.confirmed && rejected == that.rejected;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), confirmed, rejected);
-    }
 }

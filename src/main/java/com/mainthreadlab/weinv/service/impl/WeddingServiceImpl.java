@@ -6,7 +6,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.mainthreadlab.weinv.commons.Utils;
 import com.mainthreadlab.weinv.config.security.annotation.JwtDetails;
-import com.mainthreadlab.weinv.dto.request.ConfirmRequest;
+import com.mainthreadlab.weinv.dto.request.UpdateInvitationRequest;
 import com.mainthreadlab.weinv.dto.request.UserRequest;
 import com.mainthreadlab.weinv.dto.request.WeddingRequest;
 import com.mainthreadlab.weinv.dto.request.WeddingUpdateRequest;
@@ -16,14 +16,14 @@ import com.mainthreadlab.weinv.dto.security.AuthUserRequest;
 import com.mainthreadlab.weinv.exception.BadRequestException;
 import com.mainthreadlab.weinv.exception.ResourceNotFoundException;
 import com.mainthreadlab.weinv.mapper.UserMapper;
-import com.mainthreadlab.weinv.mapper.WeddingGuestMapper;
+import com.mainthreadlab.weinv.mapper.InvitationMapper;
 import com.mainthreadlab.weinv.mapper.WeddingMapper;
 import com.mainthreadlab.weinv.model.User;
 import com.mainthreadlab.weinv.model.Wedding;
-import com.mainthreadlab.weinv.model.WeddingGuest;
+import com.mainthreadlab.weinv.model.Invitation;
+import com.mainthreadlab.weinv.model.enums.InvitationStatus;
 import com.mainthreadlab.weinv.model.enums.Language;
-import com.mainthreadlab.weinv.model.enums.Role;
-import com.mainthreadlab.weinv.repository.WeddingGuestRepository;
+import com.mainthreadlab.weinv.repository.InvitationRepository;
 import com.mainthreadlab.weinv.repository.WeddingRepository;
 import com.mainthreadlab.weinv.service.EmailService;
 import com.mainthreadlab.weinv.service.UserService;
@@ -58,13 +58,13 @@ import static com.mainthreadlab.weinv.model.enums.EventType.WEDDING;
 public class WeddingServiceImpl implements WeddingService {
 
     private final WeddingRepository weddingRepository;
-    private final WeddingGuestRepository weddingGuestRepository;
+    private final InvitationRepository invitationRepository;
     private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
     private final EmailService emailSender;
     private final WeddingMapper weddingMapper;
     private final UserMapper userMapper;
-    private final WeddingGuestMapper weddingGuestMapper;
+    private final InvitationMapper invitationMapper;
 
     @Value("${weinv.ui.login-uri}")
     private String uiLoginUri;
@@ -118,9 +118,9 @@ public class WeddingServiceImpl implements WeddingService {
 
     @Override
     @Transactional
-    public void invite(String uuid, UserRequest userRequest) {
+    public void invite(String uuid, UserRequest request) {
 
-        log.info("[invite] - start: {}", userRequest.toString());
+        log.info("[invite] - start: {}", request.toString());
 
         Wedding wedding = getByUuid(uuid);
         if (wedding == null) {
@@ -129,32 +129,31 @@ public class WeddingServiceImpl implements WeddingService {
         }
 
         if (Objects.nonNull(wedding.getMaxInvitations())) {
-            int invitationsAlreadySent = weddingGuestRepository.findByWeddingOrderByGuest_FirstNameAscGuest_LastNameAsc(wedding).size();
+            int invitationsAlreadySent = invitationRepository.findByWeddingOrderByGuest_FirstNameAscGuest_LastNameAsc(wedding).size();
             if (wedding.getMaxInvitations() == invitationsAlreadySent) {
                 log.error("[invite] - maximum number of invitations reached, uuid = {}", uuid);
                 throw new BadRequestException(MAX_INVITATION_NUMBER_REACHED);
             }
         }
 
-        if (Objects.nonNull(userRequest.getTableNumber()) &&
+        if (Objects.nonNull(request.getTableNumber()) &&
                 Objects.nonNull(wedding.getMaxTables()) &&
-                (userRequest.getTableNumber() > wedding.getMaxTables())) {
+                (request.getTableNumber() > wedding.getMaxTables())) {
             log.error("[invite] - table number incorrect, uuid = {}", uuid);
             throw new BadRequestException(INCORRECT_TABLE_NUMBER);
         }
 
-        userRequest.setRole(Role.GUEST);
-        userRequest.setEventType(wedding.getEventType());
-        User user = userService.save(userRequest);
+        request.setEventType(wedding.getEventType());
+        User user = userService.save(request);
 
-        weddingGuestRepository.save(weddingGuestMapper.toEntity(wedding, user, userRequest.getTableNumber()));
+        invitationRepository.save(invitationMapper.toEntity(wedding, user, request));
 
         log.info("[invite] - save in authorization-server");
-        AuthUserRequest authUserRequest = userMapper.toAuthUser(userRequest);
+        AuthUserRequest authUserRequest = userMapper.toAuthUser(request);
         customUserDetailsService.addUserDetails(authUserRequest);
 
         log.info("[invite] - sending invitation mail...");
-        sendMail(wedding, userRequest);
+        sendMail(wedding, request);
 
         log.info("[invite] - end");
     }
@@ -167,8 +166,8 @@ public class WeddingServiceImpl implements WeddingService {
         WeddingResponse response = null;
         Wedding wedding = getByUuid(uuid);
         if (wedding != null) {
-            List<WeddingGuest> weddingGuestList = weddingGuestRepository.findByWedding(wedding);
-            response = weddingMapper.toModel(wedding, weddingGuestList.size());
+            List<Invitation> invitationList = invitationRepository.findByWedding(wedding);
+            response = weddingMapper.toModel(wedding, invitationList.size());
         }
 
         log.info("[get wedding] - end");
@@ -178,31 +177,34 @@ public class WeddingServiceImpl implements WeddingService {
 
     // also search
     @Override
-    public Page<InvitationResponse> getWeddingInvitations(String uuidWedding, String searchKeyword, Pageable pageable) {
+    public Page<InvitationResponse> getWeddingInvitations(String uuidWedding, String searchKeyword, Pageable pageable, InvitationStatus invitationStatus) {
 
         log.info("[get wedding invitations] - start: uuidWedding={}", uuidWedding);
 
-        Specification<WeddingGuest> specification = (root, query, criteriaBuilder) -> {
+        Specification<Invitation> specification = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            query.orderBy(criteriaBuilder.asc(root.get(GUEST_FIELD).get("firstName")));
-            predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("wedding").get("uuid"), uuidWedding),
-                    criteriaBuilder.greaterThanOrEqualTo(root.get("wedding").get("date"), new Date())));
+            query.orderBy(criteriaBuilder.asc(root.get(GUEST_FIELD).get(FIRSTNAME_FIELD)));
+            predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get(WEDDING_FIELD).get(UUID_FIELD), uuidWedding),
+                    criteriaBuilder.greaterThanOrEqualTo(root.get(WEDDING_FIELD).get(WEDDING_DATE_FIELD), new Date())));
 
-            if (StringUtils.isNotBlank(searchKeyword)) {
-                String key = searchKeyword + "%";
-                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get(GUEST_FIELD).get("username"), key),
-                        criteriaBuilder.like(root.get(GUEST_FIELD).get("firstName"), key),
-                        criteriaBuilder.like(root.get(GUEST_FIELD).get("lastName"), key)));
+            if (Objects.nonNull(invitationStatus)) {
+                predicates.add(criteriaBuilder.equal(root.get(INVITATION_STATUS_FIELD), invitationStatus.name()));
             }
-            predicates.add(criteriaBuilder.isTrue(root.get(GUEST_FIELD).get("enabled")));
+            if (StringUtils.isNotBlank(searchKeyword)) {
+                String keyword = LIKE_KEYWORD_FORMAT.replace("keyword", searchKeyword);
+                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get(GUEST_FIELD).get(USERNAME_FIELD), keyword),
+                        criteriaBuilder.like(root.get(GUEST_FIELD).get(FIRSTNAME_FIELD), keyword),
+                        criteriaBuilder.like(root.get(GUEST_FIELD).get(LASTNAME_FIELD), keyword)));
+            }
+            predicates.add(criteriaBuilder.isTrue(root.get(GUEST_FIELD).get(ENABLED_FIELD)));
             return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
         };
-        Page<WeddingGuest> weddingGuestList = weddingGuestRepository.findAll(specification, pageable);
+        Page<Invitation> invitationsPage = invitationRepository.findAll(specification, pageable);
 
-        log.info("[get wedding invitations] - found {} element(s)", weddingGuestList.getSize());
+        log.info("[get wedding invitations] - found {} element(s)", invitationsPage.getSize());
         log.info("[get wedding invitations] - end");
 
-        return weddingGuestList.map(weddingGuestMapper::toInvitation);
+        return invitationsPage.map(invitationMapper::toInvitation);
 
     }
 
@@ -215,7 +217,7 @@ public class WeddingServiceImpl implements WeddingService {
         Page<Wedding> pageWeddings = weddingRepository.findAll(pageable);
         List<WeddingResponse> response = pageWeddings
                 .stream()
-                .map(w -> weddingMapper.toModel(w, weddingGuestRepository.findByWedding(w).size()))
+                .map(w -> weddingMapper.toModel(w, invitationRepository.findByWedding(w).size()))
                 .toList();
 
         // remove unnecessary data (QoS)
@@ -301,9 +303,9 @@ public class WeddingServiceImpl implements WeddingService {
                 throw new ResourceNotFoundException(WEDDING_NOT_FOUND);
             }
         }
-        List<WeddingGuest> weddingGuestList = weddingGuestRepository.findByWedding(wedding);
-        weddingGuestRepository.deleteAll(weddingGuestList);   // delete all invitations
-        weddingGuestList.forEach(wg -> userService.deleteUser(wg.getGuest().getUuid(), uuidWedding));  // delete guests
+        List<Invitation> invitationList = invitationRepository.findByWedding(wedding);
+        invitationRepository.deleteAll(invitationList);   // delete all invitations
+        invitationList.forEach(wg -> userService.deleteUser(wg.getGuest().getUuid(), uuidWedding));  // delete guests
         userService.deleteUser(wedding.getResponsible().getUuid(), uuidWedding);   // delete responsible
         weddingRepository.delete(wedding);   // delete wedding
 
@@ -312,37 +314,32 @@ public class WeddingServiceImpl implements WeddingService {
     }
 
     @Override
-    public void confirmInvitation(ConfirmRequest confirmRequest, String uuidWedding, String uuidGuest) {
+    public void updateInvitationStatus(UpdateInvitationRequest request, String uuidWedding, String uuidGuest) {
 
-        log.info("[confirm invitation] - start: uuidWedding={}, uuiGuest={}", uuidWedding, uuidGuest);
+        log.info("[update invitation status] - start: uuidWedding={}, uuiGuest={}", uuidWedding, uuidGuest);
 
         Wedding wedding = getByUuid(uuidWedding);
         if (wedding == null) {
-            log.error("[confirm invitation] - wedding not found, uuid = {}", uuidWedding);
+            log.error("[update invitation status] - wedding not found, uuid = {}", uuidWedding);
             throw new ResourceNotFoundException(WEDDING_NOT_FOUND);
         }
 
         User guest = userService.getByUuid(uuidGuest);
         if (guest == null) {
-            log.error("[confirm invitation] - user not found, uuid = {}", uuidGuest);
+            log.error("[update invitation status] - user not found, uuid = {}", uuidGuest);
             throw new ResourceNotFoundException(USER_ALREADY_RESPONSIBLE);
         }
 
-        WeddingGuest weddingGuest = weddingGuestRepository.findByWeddingAndGuest(wedding, guest);
-        if (weddingGuest == null) {
-            log.error("[confirm invitation] - invitation not found, uuidWedding={}, uuiGuest={}", uuidWedding, uuidWedding);
+        Invitation invitation = invitationRepository.findByWeddingAndGuest(wedding, guest);
+        if (invitation == null) {
+            log.error("[update invitation status] - invitation not found, uuidWedding={}, uuiGuest={}", uuidWedding, uuidWedding);
             throw new ResourceNotFoundException(INVITATION_NOT_FOUND);
         }
 
-        if (confirmRequest.getAccept() != null && confirmRequest.getAccept()) {
-            weddingGuest.setConfirmed(true);
-            weddingGuest.setRejected(false);
-        } else {
-            weddingGuest.setRejected(true);
-            weddingGuest.setConfirmed(false);
-        }
+        invitation.setStatus(request.getStatus());
+        invitation.setTotalInvitations(request.getTotalInvitations());
 
-        log.info("[confirm invitation] - end");
+        log.info("[update invitation status] - end");
     }
 
     /**
@@ -355,7 +352,7 @@ public class WeddingServiceImpl implements WeddingService {
 
         Wedding wedding = getByUuid(uuidWedding);
         if (wedding == null) {
-            log.error("[confirm invitation] - Wedding not found, uuid = {}", uuidWedding);
+            log.error("[download pdf] - wedding not found, uuid = {}", uuidWedding);
             throw new ResourceNotFoundException(WEDDING_NOT_FOUND);
         }
 
@@ -393,12 +390,11 @@ public class WeddingServiceImpl implements WeddingService {
     }
 
     private void addRows(PdfPTable table, Wedding wedding) {
-        List<WeddingGuest> weddingGuestList = weddingGuestRepository.findByWeddingOrderByGuest_FirstNameAscGuest_LastNameAsc(wedding);
-        for (WeddingGuest wg : weddingGuestList) {
+        List<Invitation> invitationList = invitationRepository.findByWeddingOrderByGuest_FirstNameAscGuest_LastNameAsc(wedding);
+        for (Invitation wg : invitationList) {
             table.addCell(getRowPdfPCell(wg.getGuest().getFirstName() + " " + wg.getGuest().getLastName()));
             table.addCell(getRowPdfPCell(wg.getTableNumber() != null ? wg.getTableNumber().toString() : null));
-            table.addCell(getRowPdfPCell(wg.isConfirmed() ? "X" : ""));
-            table.addCell(getRowPdfPCell(wg.isRejected() ? "X" : ""));
+            table.addCell(getRowPdfPCell(wg.getStatus().name()));
         }
     }
 
@@ -413,36 +409,21 @@ public class WeddingServiceImpl implements WeddingService {
     private void addTableTileAndHeader(PdfPTable table, Wedding wedding) {
         // title
         Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
-        String title = "ANNIVERSAIRE DE " + wedding.getEventOwnerFirstName().toUpperCase() + " " + wedding.getEventOwnerLastName().toUpperCase();
+        String title = INVITATION_PDF_MAIN_TITLE.formatted(wedding.getEventOwnerFirstName().toUpperCase(), wedding.getEventOwnerLastName().toUpperCase());
         PdfPCell pdfPCell = new PdfPCell(new Paragraph(title, boldFont));
         pdfPCell.setColspan(4);
         pdfPCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         pdfPCell.setPadding(20.0f);
         table.addCell(pdfPCell);
 
-        List<String> columns = Arrays.asList(NOM, TABLE_NO, CONFIRMED, REJECTED_FR);
-        String maxSeatsTitle = "Nombre d'invitations: ";
-        String seatsTaken = "Invitations envoyées: ";
-        String seatsAvailableTitle = "Invitations disponibiles: ";
-        String maxTables = "Nombre de tables: ";
-
-        if (Language.EN.equals(wedding.getResponsible().getLanguage())) {
-            maxSeatsTitle = "Number of invitations: ";
-            maxTables = "Number of tables: ";
-            seatsTaken = "Invitations sent: ";
-            seatsAvailableTitle = "Invitations available: ";
-            columns = Arrays.asList("Name", TABLE_NO, "Confirmed", "Rejected");
-        }
+        List<String> columns = Arrays.asList(NOM, TABLE_NO, PRESENCE);
 
         // seats information
         Font font = new Font(Font.FontFamily.TIMES_ROMAN, 14);
-        List<WeddingGuest> weddingGuestList = weddingGuestRepository.findByWeddingOrderByGuest_FirstNameAscGuest_LastNameAsc(wedding);
-        int seatsAvailable = wedding.getMaxInvitations() - weddingGuestList.size();
-        String infos = maxTables + wedding.getMaxTables() + "\n"
-                + maxSeatsTitle + wedding.getMaxInvitations() + "\n"
-                + seatsTaken + weddingGuestList.size() + "\n"
-                + seatsAvailableTitle + seatsAvailable;
-        pdfPCell = new PdfPCell(new Paragraph(infos, font));
+        List<Invitation> invitationList = invitationRepository.findByWeddingOrderByGuest_FirstNameAscGuest_LastNameAsc(wedding);
+        int seatsAvailable = wedding.getMaxInvitations() - invitationList.size();
+
+        pdfPCell = new PdfPCell(new Paragraph(INVITATION_PDF_TITLE.formatted(wedding.getMaxInvitations(), invitationList.size(), seatsAvailable), font));
         pdfPCell.setColspan(4);
         pdfPCell.setPadding(10.0f);
         table.addCell(pdfPCell);
@@ -461,43 +442,21 @@ public class WeddingServiceImpl implements WeddingService {
     private void addTableTileAndHeaderWeddingEvent(PdfPTable table, Wedding wedding) {
         // title
         Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
-
-        String title;
-        if (wedding.getEventType() == WEDDING) {
-            title = "MARIAGE DE " + wedding.getHusbandName().toUpperCase() + " ET " + wedding.getWifeName().toUpperCase();
-        } else {
-            title = "ANNIVERSAIRE DE " + wedding.getEventOwnerFirstName().toUpperCase() + " " + wedding.getEventOwnerLastName().toUpperCase();
-        }
-
+        String title = W_INVITATION_PDF_MAIN_TITLE.formatted(wedding.getHusbandName().toUpperCase(), wedding.getWifeName().toUpperCase());
         PdfPCell pdfPCell = new PdfPCell(new Paragraph(title, boldFont));
         pdfPCell.setColspan(4);
         pdfPCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         pdfPCell.setPadding(20.0f);
         table.addCell(pdfPCell);
 
-        List<String> columns = Arrays.asList("Nom", "Table No", "Confirmé", "Rejeté");
-        String maxSeatsTitle = "Nombre d'invitations: ";
-        String seatsTaken = "Invitations envoyées: ";
-        String seatsAvailableTitle = "Invitations disponibiles: ";
-        String maxTables = "Nombre de tables: ";
-
-        if (Language.EN.equals(wedding.getResponsible().getLanguage())) {
-            maxSeatsTitle = "Number of invitations: ";
-            maxTables = "Number of tables: ";
-            seatsTaken = "Invitations sent: ";
-            seatsAvailableTitle = "Invitations available: ";
-            columns = Arrays.asList("Name", "Table No", "Confirmed", "Rejected");
-        }
+        List<String> columns = Arrays.asList(NOM, TABLE_NO, PRESENCE);
 
         // seats information
         Font font = new Font(Font.FontFamily.TIMES_ROMAN, 14);
-        List<WeddingGuest> weddingGuestList = weddingGuestRepository.findByWeddingOrderByGuest_FirstNameAscGuest_LastNameAsc(wedding);
-        int seatsAvailable = wedding.getMaxInvitations() - weddingGuestList.size();
-        String infos = maxTables + wedding.getMaxTables() + "\n"
-                + maxSeatsTitle + wedding.getMaxInvitations() + "\n"
-                + seatsTaken + weddingGuestList.size() + "\n"
-                + seatsAvailableTitle + seatsAvailable;
-        pdfPCell = new PdfPCell(new Paragraph(infos, font));
+        List<Invitation> invitationList = invitationRepository.findByWeddingOrderByGuest_FirstNameAscGuest_LastNameAsc(wedding);
+        int seatsAvailable = wedding.getMaxInvitations() - invitationList.size();
+
+        pdfPCell = new PdfPCell(new Paragraph(INVITATION_PDF_TITLE.formatted(wedding.getMaxInvitations(), invitationList.size(), seatsAvailable), font));
         pdfPCell.setColspan(4);
         pdfPCell.setPadding(10.0f);
         table.addCell(pdfPCell);
@@ -513,21 +472,21 @@ public class WeddingServiceImpl implements WeddingService {
         }
     }
 
-    private void sendMail(Wedding wedding, UserRequest userRequest) {
+    private void sendMail(Wedding wedding, UserRequest request) {
         try {
             String template = Utils.readFileFromResource(frInvitationBodyFilePath);
-            if (Language.EN.equals(userRequest.getLanguage())) {
+            if (Language.EN.equals(request.getLanguage())) {
                 template = Utils.readFileFromResource(enInvitationBodyFilePath);
             }
 
             template = template.replace("{f_firstname}", wedding.getWifeName())
                     .replace("{m_firstname}", wedding.getHusbandName())
                     .replace("{login_uri}", uiLoginUri)
-                    .replace("{username}", userRequest.getUsername())
-                    .replace("{password}", userRequest.getPassword());
+                    .replace("{username}", request.getUsername())
+                    .replace("{password}", request.getPassword());
 
             // send to the guest
-            emailSender.sendHtmlEmail(userRequest.getEmail(), invitationSubject, template);
+            emailSender.sendHtmlEmail(request.getEmail(), invitationSubject, template);
             // send a copy to the responsible for wedding
             emailSender.sendHtmlEmail(wedding.getResponsible().getEmail(), invitationSubject, template);
         } catch (Exception e) {

@@ -9,7 +9,6 @@ import com.mainthreadlab.weinv.dto.request.UpdateUserRequest;
 import com.mainthreadlab.weinv.dto.request.UserRequest;
 import com.mainthreadlab.weinv.dto.response.LoginResponse;
 import com.mainthreadlab.weinv.dto.response.UserResponse;
-import com.mainthreadlab.weinv.dto.security.AuthUpdateUserRequest;
 import com.mainthreadlab.weinv.dto.security.AuthUserRequest;
 import com.mainthreadlab.weinv.exception.ForbiddenException;
 import com.mainthreadlab.weinv.exception.ResourceNotFoundException;
@@ -18,11 +17,11 @@ import com.mainthreadlab.weinv.exception.UniqueConstraintViolationException;
 import com.mainthreadlab.weinv.mapper.UserMapper;
 import com.mainthreadlab.weinv.model.User;
 import com.mainthreadlab.weinv.model.Wedding;
-import com.mainthreadlab.weinv.model.WeddingGuest;
+import com.mainthreadlab.weinv.model.Invitation;
 import com.mainthreadlab.weinv.model.enums.Language;
 import com.mainthreadlab.weinv.model.enums.Role;
 import com.mainthreadlab.weinv.repository.UserRepository;
-import com.mainthreadlab.weinv.repository.WeddingGuestRepository;
+import com.mainthreadlab.weinv.repository.InvitationRepository;
 import com.mainthreadlab.weinv.repository.WeddingRepository;
 import com.mainthreadlab.weinv.service.EmailService;
 import com.mainthreadlab.weinv.service.UserService;
@@ -59,7 +58,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     private final WeddingRepository weddingRepository;
-    private final WeddingGuestRepository weddingGuestRepository;
+    private final InvitationRepository invitationRepository;
     private final ObjectMapper objectMapper;
     private final UserMapper mapper;
     private final EmailService emailSender;
@@ -100,9 +99,9 @@ public class UserServiceImpl implements UserService {
         }
 
         Wedding wedding = weddingRepository.findByResponsible(user);
-        WeddingGuest weddingGuest = weddingGuestRepository.findByGuest(user);
-        if (wedding == null && weddingGuest != null) {
-            wedding = weddingGuest.getWedding();
+        Invitation invitation = invitationRepository.findByGuest(user);
+        if (wedding == null && invitation != null) {
+            wedding = invitation.getWedding();
         }
 
         if (wedding != null && isSourceDateBeforeTargetDate(wedding.getDate(), new Date())) {
@@ -142,8 +141,8 @@ public class UserServiceImpl implements UserService {
                     if (wedding != null) {
                         uuidWedding = wedding.getUuid();
                     }
-                } else if (roles.contains(Role.GUEST.getDescription()) && weddingGuest != null) {
-                    uuidWedding = weddingGuest.getWedding().getUuid();
+                } else if (roles.contains(Role.GUEST.getDescription()) && invitation != null) {
+                    uuidWedding = invitation.getWedding().getUuid();
                 }
             }
 
@@ -213,7 +212,7 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotBlank(uuidWedding)) {
             Wedding wedding = weddingRepository.findByUuid(uuidWedding);
             if (wedding != null) {
-                weddingGuestRepository.deleteByWeddingAndGuest(wedding, user);
+                invitationRepository.deleteByWeddingAndGuest(wedding, user);
             }
         }
 
@@ -250,9 +249,9 @@ public class UserServiceImpl implements UserService {
         User user = getByUuid(uuid);
         if (user != null) {
             userResponse = mapper.toModel(user);
-            WeddingGuest weddingGuest = weddingGuestRepository.findByGuest(user);
-            if (weddingGuest != null) {
-                userResponse.setTableNumber(weddingGuest.getTableNumber());
+            Invitation invitation = invitationRepository.findByGuest(user);
+            if (invitation != null) {
+                userResponse.setTableNumber(invitation.getTableNumber());
             }
         }
 
@@ -283,9 +282,9 @@ public class UserServiceImpl implements UserService {
         if (Objects.nonNull(updateUserRequest.getTableNumber())) {
             Wedding wedding = weddingRepository.findByUuid(uuidWedding);
             if (wedding != null) {
-                WeddingGuest weddingGuest = weddingGuestRepository.findByWeddingAndGuest(wedding, user);
-                if (weddingGuest != null) {
-                    weddingGuest.setTableNumber(updateUserRequest.getTableNumber());
+                Invitation invitation = invitationRepository.findByWeddingAndGuest(wedding, user);
+                if (invitation != null) {
+                    invitation.setTableNumber(updateUserRequest.getTableNumber());
                 }
             }
         }

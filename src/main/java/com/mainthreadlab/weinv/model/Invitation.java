@@ -1,7 +1,8 @@
 package com.mainthreadlab.weinv.model;
 
 import com.mainthreadlab.weinv.model.base.BaseEntity;
-import com.mainthreadlab.weinv.model.base.WeddingGuestId;
+import com.mainthreadlab.weinv.model.base.InvitationId;
+import com.mainthreadlab.weinv.model.enums.InvitationStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,11 +15,11 @@ import javax.persistence.*;
 @Getter
 @ToString
 @NoArgsConstructor
-@Table(name = "ws_wedding_guest")
-public class WeddingGuest extends BaseEntity {
+@Table(name = "ws_invitations")
+public class Invitation extends BaseEntity {
 
     @EmbeddedId
-    private WeddingGuestId id;
+    private InvitationId id;
 
     @ManyToOne
     @ToString.Exclude
@@ -34,8 +35,9 @@ public class WeddingGuest extends BaseEntity {
 
     private Integer tableNumber;
 
-    private boolean confirmed = false;
+    private Integer totalInvitations;
 
-    private boolean rejected = false;
+    @Enumerated(EnumType.STRING)
+    private InvitationStatus status;
 
 }

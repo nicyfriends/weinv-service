@@ -20,8 +20,8 @@ import java.util.Date;
 public class User extends BaseEntity {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
-//    @SequenceGenerator(name = "user_seq")
+    //@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+    //@SequenceGenerator(name = "user_seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -34,29 +34,20 @@ public class User extends BaseEntity {
     //@Column(nullable = false)
     private String firstName;
 
-    // @Column(nullable = false)
+    //@Column(nullable = false)
     private String lastName;
 
-    /**
-     * couple information
-     */
+    /** couple information */
     private String wife;
     private String husband;
     private boolean couple;
 
     private String email;
-
     private String phoneNumber;
 
-    /**
-     * useless in this server
-     * it's necessary only in authorization-server
-     */
-//    @Column(nullable = false)
-//    private String password;
-
+    //"role1,roles2..."
     @Column(nullable = false)
-    private String roles;            // "role1,roles2..."
+    private String roles;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -67,8 +58,11 @@ public class User extends BaseEntity {
 
     private Double price;
 
+    //for responsible
     @Enumerated(EnumType.STRING)
-    private EventType eventType;  // for responsible
+    private EventType eventType;
+
+    private Integer totalInvitations;
 
     private boolean enabled;
 
