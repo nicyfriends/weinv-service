@@ -37,8 +37,6 @@ public class Invitation extends BaseEntity {
 
     private Integer totalInvitations;
 
-    @Basic(optional = false)
-    @Column(name = "status", columnDefinition = "enum('ATTENDING','NOT_ATTENDING','MAYBE','NOT_REPLIED')")
     @Enumerated(EnumType.STRING)
     private InvitationStatus status;
 

@@ -188,7 +188,7 @@ public class WeddingServiceImpl implements WeddingService {
                     criteriaBuilder.greaterThanOrEqualTo(root.get(WEDDING_FIELD).get(WEDDING_DATE_FIELD), new Date())));
 
             if (Objects.nonNull(invitationStatus)) {
-                predicates.add(criteriaBuilder.equal(root.get(INVITATION_STATUS_FIELD), invitationStatus.name()));
+                predicates.add(criteriaBuilder.equal(root.get(INVITATION_STATUS_FIELD), invitationStatus));
             }
             if (StringUtils.isNotBlank(searchKeyword)) {
                 String keyword = LIKE_KEYWORD_FORMAT.replace("keyword", searchKeyword);
