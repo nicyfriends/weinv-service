@@ -144,12 +144,12 @@ public class WeddingController {
             @RequestParam(required = false) String searchKeyword,
             @RequestParam(required = false, defaultValue = "0") int offset,
             @RequestParam(required = false, defaultValue = "5") int limit,
-            @RequestParam(required = false) InvitationStatus invitationStatus,
+            @RequestParam(required = false) InvitationStatus status,
             @RequestParam(required = false, defaultValue = "guest.firstName:ASC") String sortingKeys,
             HttpServletRequest request) {
 
         log.info("[get wedding invitations] - request: {}", request.getRequestURI());
-        Page<InvitationResponse> invitationsResponse = weddingService.getWeddingInvitations(uuid, searchKeyword, Pagination.toPageable(offset, limit, sortingKeys), invitationStatus);
+        Page<InvitationResponse> invitationsResponse = weddingService.getWeddingInvitations(uuid, searchKeyword, Pagination.toPageable(offset, limit, sortingKeys), status);
         return ResponseEntity.ok().body(invitationsResponse);
     }
 
