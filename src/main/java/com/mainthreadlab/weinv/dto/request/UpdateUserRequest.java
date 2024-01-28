@@ -1,5 +1,6 @@
 package com.mainthreadlab.weinv.dto.request;
 
+import com.mainthreadlab.weinv.model.enums.InvitationStatus;
 import com.mainthreadlab.weinv.model.enums.Language;
 import lombok.Data;
 
@@ -26,6 +27,8 @@ public class UpdateUserRequest {
     private String phoneNumber;        // both
 
     private Language language;      // both
+
+    private Integer totalInvitations; //
 
     private Integer tableNumber;          // for the guest
 

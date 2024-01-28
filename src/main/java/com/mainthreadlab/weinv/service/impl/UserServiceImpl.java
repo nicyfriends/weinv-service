@@ -271,9 +271,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(String uuid, String uuidWedding, UpdateUserRequest updateUserRequest) {
+    public void updateUser(String uuid, String uuidWedding, UpdateUserRequest request) {
 
-        String uuidFinal = StringUtils.isNotBlank(updateUserRequest.getUuid()) ? updateUserRequest.getUuid() : uuid;
+        String uuidFinal = StringUtils.isNotBlank(request.getUuid()) ? request.getUuid() : uuid;
         log.info("[update user] - start: uuid={}", uuidFinal);
 
         User user = getByUuid(uuidFinal);
@@ -283,45 +283,50 @@ public class UserServiceImpl implements UserService {
         }
 
         // update in weinv
-        if (Objects.nonNull(updateUserRequest.getTableNumber())) {
+        if (Objects.nonNull(request.getTableNumber())) {
             Wedding wedding = weddingRepository.findByUuid(uuidWedding);
             if (wedding != null) {
                 Invitation invitation = invitationRepository.findByWeddingAndGuest(wedding, user);
                 if (invitation != null) {
-                    invitation.setTableNumber(updateUserRequest.getTableNumber());
+                    invitation.setTableNumber(request.getTableNumber());
+                    if (request.getTotalInvitations() != null) {
+                        WeddingService.updateStatusInvitationNumber(wedding, invitation.getStatus(), invitation.getTotalInvitations(), "-");
+                        invitation.setTotalInvitations(request.getTotalInvitations());
+                        WeddingService.updateStatusInvitationNumber(wedding, invitation.getStatus(), invitation.getTotalInvitations(), "+");
+                    }
                 }
             }
         }
-        processUpdate(updateUserRequest, user);
+        processUpdate(request, user);
 
         log.info("[update user] - end");
     }
 
-    private void processUpdate(UpdateUserRequest updateUserRequest, User user) {
-        if (StringUtils.isNotBlank(updateUserRequest.getEmail())) {
-            user.setEmail(updateUserRequest.getEmail());
+    private void processUpdate(UpdateUserRequest request, User user) {
+        if (StringUtils.isNotBlank(request.getEmail())) {
+            user.setEmail(request.getEmail());
         }
-        if (StringUtils.isNotBlank(updateUserRequest.getFirstName())) {
-            user.setFirstName(StringUtils.capitalize(updateUserRequest.getFirstName()));
+        if (StringUtils.isNotBlank(request.getFirstName())) {
+            user.setFirstName(StringUtils.capitalize(request.getFirstName()));
         }
-        if (StringUtils.isNotBlank(updateUserRequest.getLastName())) {
-            user.setLastName(StringUtils.capitalize(updateUserRequest.getLastName()));
+        if (StringUtils.isNotBlank(request.getLastName())) {
+            user.setLastName(StringUtils.capitalize(request.getLastName()));
         }
-        if (StringUtils.isNotBlank(updateUserRequest.getHusband())) {
-            user.setHusband(StringUtils.capitalize(updateUserRequest.getHusband()));
+        if (StringUtils.isNotBlank(request.getHusband())) {
+            user.setHusband(StringUtils.capitalize(request.getHusband()));
         }
-        if (StringUtils.isNotBlank(updateUserRequest.getWife())) {
-            user.setWife(StringUtils.capitalize(updateUserRequest.getWife()));
+        if (StringUtils.isNotBlank(request.getWife())) {
+            user.setWife(StringUtils.capitalize(request.getWife()));
         }
-        if (StringUtils.isNotBlank(updateUserRequest.getPhoneNumber())) {
-            user.setPhoneNumber(updateUserRequest.getPhoneNumber());
+        if (StringUtils.isNotBlank(request.getPhoneNumber())) {
+            user.setPhoneNumber(request.getPhoneNumber());
         }
-        if (updateUserRequest.getLanguage() != null) {
-            user.setLanguage(updateUserRequest.getLanguage());
+        if (request.getLanguage() != null) {
+            user.setLanguage(request.getLanguage());
         }
-        user.setCouple(updateUserRequest.isCouple());
+        user.setCouple(request.isCouple());
 
-        AuthUpdateUserRequest authUpdateUserRequest = mapper.map(updateUserRequest);
+        AuthUpdateUserRequest authUpdateUserRequest = mapper.map(request);
         authUpdateUserRequest.setUsername(user.getUsername());
         log.info("[update user] - (weinv > authorization-server)");
         customUserDetailsService.updateUser(authUpdateUserRequest);
