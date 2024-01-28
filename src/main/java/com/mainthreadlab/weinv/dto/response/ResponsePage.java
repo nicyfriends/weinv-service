@@ -28,7 +28,7 @@ public class ResponsePage<T> extends PageImpl<T> {
     }
 
     public ResponsePage(Page<T> page) {
-        super(page.getContent(), page.getPageable(), page.getContent().size());
+        super(page.getContent(), page.getPageable(), page.getTotalPages());
     }
 
 
