@@ -371,7 +371,7 @@ public class WeddingServiceImpl implements WeddingService {
         Document document = new Document();
         PdfWriter.getInstance(document, httpResponse.getOutputStream());
         document.open();
-        PdfPTable table = new PdfPTable(4);
+        PdfPTable table = new PdfPTable(3);
         if (wedding.getEventType() == WEDDING) {
             addTableTileAndHeaderWeddingEvent(table, wedding);
         } else {
