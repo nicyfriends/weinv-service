@@ -62,8 +62,6 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
-    private Integer totalInvitations;
-
     private boolean enabled;
 
 }
