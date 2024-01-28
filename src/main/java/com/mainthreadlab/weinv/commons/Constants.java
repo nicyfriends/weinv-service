@@ -15,7 +15,7 @@ public class Constants {
     public static final String TABLE_NO = "Table No";
     public static final String NOM = "Nom";
     public static final String PRESENCE = "Présence";
-    public static final String INVITATION_STATUS_FIELD = "invitationStatus";
+    public static final String INVITATION_STATUS_FIELD = "status";
     public static final String USERNAME_FIELD = "username";
     public static final String LASTNAME_FIELD = "lastName";
     public static final String FIRSTNAME_FIELD = "firstName";
