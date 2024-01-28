@@ -19,7 +19,7 @@ public interface UserService {
 
     User save(UserRequest userRequest);
 
-    void deleteUser(String uuid, String uuidWedding);
+    void deleteGuestInvitation(String uuid, String uuidWedding);
 
     UserResponse getUser(String uuid);
 

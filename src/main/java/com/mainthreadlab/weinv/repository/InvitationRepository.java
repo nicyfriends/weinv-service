@@ -22,5 +22,4 @@ public interface InvitationRepository extends JpaRepository<Invitation, Invitati
 
     Invitation findByGuest(User user);
 
-    void deleteByWeddingAndGuest(Wedding wedding, User user);
 }

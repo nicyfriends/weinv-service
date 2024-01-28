@@ -315,8 +315,8 @@ public class WeddingServiceImpl implements WeddingService {
         }
         List<Invitation> invitationList = invitationRepository.findByWedding(wedding);
         invitationRepository.deleteAll(invitationList);   // delete all invitations
-        invitationList.forEach(wg -> userService.deleteUser(wg.getGuest().getUuid(), uuidWedding));  // delete guests
-        userService.deleteUser(wedding.getResponsible().getUuid(), uuidWedding);   // delete responsible
+        invitationList.forEach(wg -> userService.deleteGuestInvitation(wg.getGuest().getUuid(), uuidWedding));  // delete guests
+        userService.deleteGuestInvitation(wedding.getResponsible().getUuid(), uuidWedding);   // delete responsible
         weddingRepository.delete(wedding);   // delete wedding
 
         log.info("[delete wedding] - end");
@@ -346,32 +346,12 @@ public class WeddingServiceImpl implements WeddingService {
             throw new ResourceNotFoundException(INVITATION_NOT_FOUND);
         }
 
-        updateStatusInvitationNumber(wedding, invitation.getStatus(), invitation.getTotalInvitations(), "-");
-        updateStatusInvitationNumber(wedding, request.getStatus(), invitation.getTotalInvitations(), "+");
+        WeddingService.updateStatusInvitationNumber(wedding, invitation.getStatus(), invitation.getTotalInvitations(), "-");
+        WeddingService.updateStatusInvitationNumber(wedding, request.getStatus(), invitation.getTotalInvitations(), "+");
 
         invitation.setStatus(request.getStatus());
 
         log.info("[update invitation status] - end");
-    }
-
-    private static void updateStatusInvitationNumber(Wedding wedding, InvitationStatus status, Integer totalInvitations, String operation) {
-        if ("-".equals(operation)) {
-            switch (status) {
-                case ATTENDING -> wedding.setTotalGuestsAttending(wedding.getTotalGuestsAttending() - totalInvitations);
-                case NOT_ATTENDING -> wedding.setTotalGuestsNotAttending(wedding.getTotalGuestsNotAttending() - totalInvitations);
-                case MAYBE -> wedding.setTotalGuestsMaybe(wedding.getTotalGuestsMaybe() - totalInvitations);
-                case NOT_REPLIED -> wedding.setTotalGuestsNotReplied(wedding.getTotalGuestsNotReplied() - totalInvitations);
-            }
-        }
-
-        if ("+".equals(operation)) {
-            switch (status) {
-                case ATTENDING -> wedding.setTotalGuestsAttending(wedding.getTotalGuestsAttending() + totalInvitations);
-                case NOT_ATTENDING -> wedding.setTotalGuestsNotAttending(wedding.getTotalGuestsNotAttending() + totalInvitations);
-                case MAYBE -> wedding.setTotalGuestsMaybe(wedding.getTotalGuestsMaybe() + totalInvitations);
-                case NOT_REPLIED -> wedding.setTotalGuestsNotReplied(wedding.getTotalGuestsNotReplied() + totalInvitations);
-            }
-        }
     }
 
     /**

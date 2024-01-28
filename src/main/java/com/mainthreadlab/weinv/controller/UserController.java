@@ -111,26 +111,20 @@ public class UserController {
 
 
     @DeleteMapping("/{uuid}")
-    @Operation(
-            operationId = "deleteUser",
-            summary = "delete user",
-            tags = {"User"},
-            responses = {
+    @Operation(operationId = "deleteGuestInvitation", summary = "delete guest's invitation", tags = {"User"}, responses = {
                     @ApiResponse(responseCode = "200", description = "Ok"),
                     @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-            }
-    )
-    public ResponseEntity<Void> deleteUser(
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+    public ResponseEntity<Void> deleteGuestInvitation(
             @PathVariable String uuid,
             @RequestParam(required = false) String uuidWedding,
             @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) throws URISyntaxException {
 
-        log.info("[DeleteUser] request: {}", request.getRequestURI());
-        userService.deleteUser(uuid, uuidWedding);
+        log.info("[delete guest invitation] request: {}", request.getRequestURI());
+        userService.deleteGuestInvitation(uuid, uuidWedding);
         return ResponseEntity.ok().build();
     }
 

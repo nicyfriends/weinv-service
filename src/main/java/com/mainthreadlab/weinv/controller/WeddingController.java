@@ -202,17 +202,11 @@ public class WeddingController {
 
 
     @DeleteMapping("/{uuid}")
-    @Operation(
-            operationId = "deleteWedding",
-            summary = "delete wedding",
-            tags = {"Wedding"},
-            responses = {
+    @Operation(operationId = "deleteWedding", summary = "delete wedding", tags = {"Wedding"}, responses = {
                     @ApiResponse(responseCode = "200", description = "Ok"),
                     @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-            }
-    )
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     public ResponseEntity<Void> deleteWedding(
             @PathVariable String uuid,
             HttpServletRequest request) {

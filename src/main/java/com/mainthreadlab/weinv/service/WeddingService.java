@@ -43,4 +43,24 @@ public interface WeddingService {
     Wedding getByResponsible(User responsible);
 
     Wedding getByUuid(String uuid);
+
+     static void updateStatusInvitationNumber(Wedding wedding, InvitationStatus status, Integer totalInvitations, String operation) {
+        if ("-".equals(operation)) {
+            switch (status) {
+                case ATTENDING -> wedding.setTotalGuestsAttending(wedding.getTotalGuestsAttending() - totalInvitations);
+                case NOT_ATTENDING -> wedding.setTotalGuestsNotAttending(wedding.getTotalGuestsNotAttending() - totalInvitations);
+                case MAYBE -> wedding.setTotalGuestsMaybe(wedding.getTotalGuestsMaybe() - totalInvitations);
+                case NOT_REPLIED -> wedding.setTotalGuestsNotReplied(wedding.getTotalGuestsNotReplied() - totalInvitations);
+            }
+        }
+
+        if ("+".equals(operation)) {
+            switch (status) {
+                case ATTENDING -> wedding.setTotalGuestsAttending(wedding.getTotalGuestsAttending() + totalInvitations);
+                case NOT_ATTENDING -> wedding.setTotalGuestsNotAttending(wedding.getTotalGuestsNotAttending() + totalInvitations);
+                case MAYBE -> wedding.setTotalGuestsMaybe(wedding.getTotalGuestsMaybe() + totalInvitations);
+                case NOT_REPLIED -> wedding.setTotalGuestsNotReplied(wedding.getTotalGuestsNotReplied() + totalInvitations);
+            }
+        }
+    }
 }

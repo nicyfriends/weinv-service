@@ -15,16 +15,17 @@ import com.mainthreadlab.weinv.exception.ResourceNotFoundException;
 import com.mainthreadlab.weinv.exception.UnauthorizedException;
 import com.mainthreadlab.weinv.exception.UniqueConstraintViolationException;
 import com.mainthreadlab.weinv.mapper.UserMapper;
+import com.mainthreadlab.weinv.model.Invitation;
 import com.mainthreadlab.weinv.model.User;
 import com.mainthreadlab.weinv.model.Wedding;
-import com.mainthreadlab.weinv.model.Invitation;
 import com.mainthreadlab.weinv.model.enums.Language;
 import com.mainthreadlab.weinv.model.enums.Role;
-import com.mainthreadlab.weinv.repository.UserRepository;
 import com.mainthreadlab.weinv.repository.InvitationRepository;
+import com.mainthreadlab.weinv.repository.UserRepository;
 import com.mainthreadlab.weinv.repository.WeddingRepository;
 import com.mainthreadlab.weinv.service.EmailService;
 import com.mainthreadlab.weinv.service.UserService;
+import com.mainthreadlab.weinv.service.WeddingService;
 import com.mainthreadlab.weinv.service.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -199,30 +200,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUser(String uuidUser, String uuidWedding) {
-        log.info("[deleteUser] - start: uuidUser={}, uuidWedding={}", uuidUser, uuidWedding);
+    public void deleteGuestInvitation(String uuidUser, String uuidWedding) {
+        log.info("[delete guest invitation] - start: uuidUser={}, uuidWedding={}", uuidUser, uuidWedding);
 
         User user = getByUuid(uuidUser);
         if (user == null) {
-            log.error("[deleteUser] - User not found, uuid={}", uuidUser);
+            log.error("[delete guest invitation] - user not found, uuid={}", uuidUser);
             throw new ResourceNotFoundException(USER_NOT_FOUND);
         }
 
-        log.info("[deleteUser] - delete wedding invitation (if it exists)");
+        log.info("[delete guest invitation] - delete wedding invitation (if it exists)");
         if (StringUtils.isNotBlank(uuidWedding)) {
             Wedding wedding = weddingRepository.findByUuid(uuidWedding);
             if (wedding != null) {
-                invitationRepository.deleteByWeddingAndGuest(wedding, user);
+                Invitation invitation = invitationRepository.findByWeddingAndGuest(wedding, user);
+                invitationRepository.delete(invitation);
+                WeddingService.updateStatusInvitationNumber(wedding, invitation.getStatus(), invitation.getTotalInvitations(), "-");
             }
         }
 
-        log.info("[deleteUser] - delete user from weinv");
+        log.info("[delete guest invitation] - delete user from weinv");
         userRepository.delete(user);
 
-        log.info("[deleteUser] - delete user from authorization-server");
+        log.info("[delete guest invitation] - delete user from authorization-server");
         customUserDetailsService.delete(user.getUsername());
 
-        log.info("[deleteUser] - success: username={}", user.getUsername());
+        log.info("[delete guest invitation] - end");
     }
 
     @Override
