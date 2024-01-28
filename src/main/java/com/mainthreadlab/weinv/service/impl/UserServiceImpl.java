@@ -9,6 +9,7 @@ import com.mainthreadlab.weinv.dto.request.UpdateUserRequest;
 import com.mainthreadlab.weinv.dto.request.UserRequest;
 import com.mainthreadlab.weinv.dto.response.LoginResponse;
 import com.mainthreadlab.weinv.dto.response.UserResponse;
+import com.mainthreadlab.weinv.dto.security.AuthUpdateUserRequest;
 import com.mainthreadlab.weinv.dto.security.AuthUserRequest;
 import com.mainthreadlab.weinv.exception.ForbiddenException;
 import com.mainthreadlab.weinv.exception.ResourceNotFoundException;
@@ -320,8 +321,10 @@ public class UserServiceImpl implements UserService {
         }
         user.setCouple(updateUserRequest.isCouple());
 
+        AuthUpdateUserRequest authUpdateUserRequest = mapper.map(updateUserRequest);
+        authUpdateUserRequest.setUsername(user.getUsername());
         log.info("[update user] - (weinv > authorization-server)");
-        customUserDetailsService.updateUser(mapper.map(updateUserRequest));
+        customUserDetailsService.updateUser(authUpdateUserRequest);
     }
 
 }
