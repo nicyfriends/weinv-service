@@ -63,6 +63,8 @@ public class UserRequest {
     // amount paid for the services: responsible
     private Double price;
 
+    private Integer totalInvitations;
+
     //@Builder.Default
     @JsonSetter(nulls = Nulls.SKIP)
     private InvitationStatus status = InvitationStatus.NOT_REPLIED;

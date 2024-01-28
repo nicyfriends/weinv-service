@@ -89,6 +89,10 @@ public class Wedding extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
+    private int totalGuestsAttending;
+    private int totalGuestsNotAttending;
+    private int totalGuestsMaybe;
+    private int totalGuestsNotReplied;
 
     //@Lob >> remember that I am not using it anymore to avoid the exception on the browser
     @Column(length = 16000000) // This should generate a medium blob

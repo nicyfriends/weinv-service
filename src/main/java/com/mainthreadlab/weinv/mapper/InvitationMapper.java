@@ -23,6 +23,7 @@ public interface InvitationMapper {
         invitation.setGuest(guest);
         invitation.setTableNumber(request.getTableNumber());
         invitation.setStatus(request.getStatus());
+        invitation.setTotalInvitations(request.getTotalInvitations());
         return invitation;
     }
 

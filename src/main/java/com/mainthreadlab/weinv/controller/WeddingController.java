@@ -1,18 +1,19 @@
 package com.mainthreadlab.weinv.controller;
 
 import com.itextpdf.text.DocumentException;
+import com.mainthreadlab.weinv.commons.Pagination;
 import com.mainthreadlab.weinv.config.security.annotation.JwtDetails;
 import com.mainthreadlab.weinv.config.security.annotation.JwtUserClaims;
 import com.mainthreadlab.weinv.dto.request.UpdateInvitationRequest;
 import com.mainthreadlab.weinv.dto.request.UserRequest;
 import com.mainthreadlab.weinv.dto.request.WeddingRequest;
 import com.mainthreadlab.weinv.dto.request.WeddingUpdateRequest;
+import com.mainthreadlab.weinv.dto.response.ErrorResponse;
 import com.mainthreadlab.weinv.dto.response.InvitationResponse;
+import com.mainthreadlab.weinv.dto.response.ResponsePage;
 import com.mainthreadlab.weinv.dto.response.WeddingResponse;
 import com.mainthreadlab.weinv.model.enums.InvitationStatus;
 import com.mainthreadlab.weinv.service.WeddingService;
-import com.mainthreadlab.weinv.dto.response.ErrorResponse;
-import com.mainthreadlab.weinv.commons.Pagination;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,7 +21,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +41,7 @@ import java.util.List;
 @RequestMapping("/weddings")
 public class WeddingController {
 
-    
+
     private final WeddingService weddingService;
 
     @Autowired
@@ -100,10 +100,10 @@ public class WeddingController {
 
     @PatchMapping(path = "/{uuid}/invitation/status")
     @Operation(operationId = "confirmInvitation", summary = "update user's invitation status", tags = {"Wedding"}, responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok"),
-                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     public ResponseEntity<Void> updateInvitationStatus(
             @PathVariable("uuid") String uuidWedding,
             @RequestParam("guest") String uuidGuest,
@@ -118,11 +118,11 @@ public class WeddingController {
 
     @GetMapping("/{uuid}")
     @Operation(operationId = "getWedding", summary = "get wedding", tags = {"Wedding"}, responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok"),
-                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     public ResponseEntity<WeddingResponse> getWedding(
             @PathVariable String uuid,
             HttpServletRequest request) {
@@ -135,11 +135,11 @@ public class WeddingController {
 
     @GetMapping("/{uuid}/invitations")
     @Operation(operationId = "getWeddingInvitations", summary = "get invitations by status", tags = {"Wedding"}, responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok"),
-                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
-    public ResponseEntity<Page<InvitationResponse>> getWeddingInvitations(
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+    public ResponseEntity<ResponsePage<InvitationResponse>> getWeddingInvitations(
             @PathVariable String uuid,
             @RequestParam(required = false) String searchKeyword,
             @RequestParam(required = false, defaultValue = "0") int offset,
@@ -149,7 +149,7 @@ public class WeddingController {
             HttpServletRequest request) {
 
         log.info("[get wedding invitations] - request: {}", request.getRequestURI());
-        Page<InvitationResponse> invitationsResponse = weddingService.getWeddingInvitations(uuid, searchKeyword, Pagination.toPageable(offset, limit, sortingKeys), status);
+        ResponsePage<InvitationResponse> invitationsResponse = weddingService.getWeddingInvitations(uuid, searchKeyword, Pagination.toPageable(offset, limit, sortingKeys), status);
         return ResponseEntity.ok().body(invitationsResponse);
     }
 

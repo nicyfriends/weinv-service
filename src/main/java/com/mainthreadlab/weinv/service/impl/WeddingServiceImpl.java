@@ -11,6 +11,7 @@ import com.mainthreadlab.weinv.dto.request.UserRequest;
 import com.mainthreadlab.weinv.dto.request.WeddingRequest;
 import com.mainthreadlab.weinv.dto.request.WeddingUpdateRequest;
 import com.mainthreadlab.weinv.dto.response.InvitationResponse;
+import com.mainthreadlab.weinv.dto.response.ResponsePage;
 import com.mainthreadlab.weinv.dto.response.WeddingResponse;
 import com.mainthreadlab.weinv.dto.security.AuthUserRequest;
 import com.mainthreadlab.weinv.exception.BadRequestException;
@@ -148,6 +149,8 @@ public class WeddingServiceImpl implements WeddingService {
 
         invitationRepository.save(invitationMapper.toEntity(wedding, user, request));
 
+        wedding.setTotalGuestsNotReplied(wedding.getTotalGuestsNotReplied() + request.getTotalInvitations());
+
         log.info("[invite] - save in authorization-server");
         AuthUserRequest authUserRequest = userMapper.toAuthUser(request);
         customUserDetailsService.addUserDetails(authUserRequest);
@@ -177,7 +180,7 @@ public class WeddingServiceImpl implements WeddingService {
 
     // also search
     @Override
-    public Page<InvitationResponse> getWeddingInvitations(String uuidWedding, String searchKeyword, Pageable pageable, InvitationStatus invitationStatus) {
+    public ResponsePage<InvitationResponse> getWeddingInvitations(String uuidWedding, String searchKeyword, Pageable pageable, InvitationStatus invitationStatus) {
 
         log.info("[get wedding invitations] - start: uuidWedding={}", uuidWedding);
 
@@ -201,11 +204,19 @@ public class WeddingServiceImpl implements WeddingService {
         };
         Page<Invitation> invitationsPage = invitationRepository.findAll(specification, pageable);
 
+        ResponsePage<InvitationResponse> responsePage = new ResponsePage<>(invitationsPage.map(invitationMapper::toInvitation));
+        if (!invitationsPage.isEmpty()) {
+            Wedding wedding = invitationsPage.getContent().get(0).getWedding();
+            responsePage.setTotalGuestsAttending(wedding.getTotalGuestsAttending());
+            responsePage.setTotalGuestsNotAttending(wedding.getTotalGuestsNotAttending());
+            responsePage.setTotalGuestsMaybe(wedding.getTotalGuestsMaybe());
+            responsePage.setTotalGuestsNotReplied(wedding.getTotalGuestsNotReplied());
+        }
+
         log.info("[get wedding invitations] - found {} element(s)", invitationsPage.getSize());
         log.info("[get wedding invitations] - end");
 
-        return invitationsPage.map(invitationMapper::toInvitation);
-
+        return responsePage;
     }
 
 
@@ -226,7 +237,6 @@ public class WeddingServiceImpl implements WeddingService {
         log.info("[get weddings] - found {} element(s)", response.size());
         log.info("[get weddings] - end");
         return response;
-
     }
 
     @Override
@@ -336,10 +346,32 @@ public class WeddingServiceImpl implements WeddingService {
             throw new ResourceNotFoundException(INVITATION_NOT_FOUND);
         }
 
+        updateStatusInvitationNumber(wedding, invitation.getStatus(), invitation.getTotalInvitations(), "-");
+        updateStatusInvitationNumber(wedding, request.getStatus(), invitation.getTotalInvitations(), "+");
+
         invitation.setStatus(request.getStatus());
-        invitation.setTotalInvitations(request.getTotalInvitations());
 
         log.info("[update invitation status] - end");
+    }
+
+    private static void updateStatusInvitationNumber(Wedding wedding, InvitationStatus status, Integer totalInvitations, String operation) {
+        if ("-".equals(operation)) {
+            switch (status) {
+                case ATTENDING -> wedding.setTotalGuestsAttending(wedding.getTotalGuestsAttending() - totalInvitations);
+                case NOT_ATTENDING -> wedding.setTotalGuestsNotAttending(wedding.getTotalGuestsNotAttending() - totalInvitations);
+                case MAYBE -> wedding.setTotalGuestsMaybe(wedding.getTotalGuestsMaybe() - totalInvitations);
+                case NOT_REPLIED -> wedding.setTotalGuestsNotReplied(wedding.getTotalGuestsNotReplied() - totalInvitations);
+            }
+        }
+
+        if ("+".equals(operation)) {
+            switch (status) {
+                case ATTENDING -> wedding.setTotalGuestsAttending(wedding.getTotalGuestsAttending() + totalInvitations);
+                case NOT_ATTENDING -> wedding.setTotalGuestsNotAttending(wedding.getTotalGuestsNotAttending() + totalInvitations);
+                case MAYBE -> wedding.setTotalGuestsMaybe(wedding.getTotalGuestsMaybe() + totalInvitations);
+                case NOT_REPLIED -> wedding.setTotalGuestsNotReplied(wedding.getTotalGuestsNotReplied() + totalInvitations);
+            }
+        }
     }
 
     /**

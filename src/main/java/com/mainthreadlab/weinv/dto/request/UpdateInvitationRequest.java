@@ -9,8 +9,6 @@ import javax.validation.constraints.NotNull;
 public class UpdateInvitationRequest {
 
     @NotNull(message = "must not be empty or null")
-    private Integer totalInvitations;
-    @NotNull(message = "must not be empty or null")
     private InvitationStatus status;
 
 }

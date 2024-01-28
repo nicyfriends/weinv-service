@@ -2,6 +2,7 @@ package com.mainthreadlab.weinv.service;
 
 import com.itextpdf.text.DocumentException;
 import com.mainthreadlab.weinv.config.security.annotation.JwtDetails;
+import com.mainthreadlab.weinv.dto.response.ResponsePage;
 import com.mainthreadlab.weinv.model.User;
 import com.mainthreadlab.weinv.model.Wedding;
 import com.mainthreadlab.weinv.dto.request.UpdateInvitationRequest;
@@ -27,7 +28,7 @@ public interface WeddingService {
 
     WeddingResponse getWedding(String uuid);
 
-    Page<InvitationResponse> getWeddingInvitations(String uuidWedding, String searchKeyword, Pageable pageable, InvitationStatus invitationStatus);
+    ResponsePage<InvitationResponse> getWeddingInvitations(String uuidWedding, String searchKeyword, Pageable pageable, InvitationStatus invitationStatus);
 
     List<WeddingResponse> getWeddings(Pageable pageable);
 
