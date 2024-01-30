@@ -146,11 +146,11 @@ public class CustomUserDetailsService extends JdbcDaoImpl {
 
     @Transactional
     public void responsiblePwdRecovery(String username, String responsibleNewPassword) {
-        logger.info("AUTHORIZATION-SERVER > [responsiblePwdRecovery] - start");
+        logger.info("AUTHORIZATION-SERVER > [responsible password recovery] - start");
 
         UserAuth user = customUserDetailsRepository.findByUsername(username);
         if (user == null) {
-            log.error("AUTHORIZATION-SERVER > [responsiblePwdRecovery] - user not found, username={}", username);
+            log.error("AUTHORIZATION-SERVER > [responsible password recovery] - user not found, username={}", username);
             throw new ResourceNotFoundException(USER_NOT_FOUND);
         }
 
@@ -158,6 +158,6 @@ public class CustomUserDetailsService extends JdbcDaoImpl {
             user.setPassword(passwordEncoder.encode(responsibleNewPassword));
         }
 
-        logger.info("AUTHORIZATION-SERVER > [responsiblePwdRecovery] - success");
+        logger.info("AUTHORIZATION-SERVER > [responsible password recovery] - success");
     }
 }

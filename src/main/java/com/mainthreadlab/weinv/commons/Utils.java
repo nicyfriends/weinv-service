@@ -1,6 +1,7 @@
 package com.mainthreadlab.weinv.commons;
 
 import io.micrometer.core.instrument.util.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 
 import java.io.IOException;
@@ -72,5 +73,9 @@ public class Utils {
         LocalDate sourceLocalDate = LocalDate.parse(getFormattedDate(source), dtf);
         LocalDate targetLocalDate = LocalDate.parse(getFormattedDate(target), dtf);
         return sourceLocalDate.isBefore(targetLocalDate);
+    }
+
+    public static String toLowerCase(String word) {
+        return StringUtils.isNotBlank(word) ? word.trim().toLowerCase() : word;
     }
 }

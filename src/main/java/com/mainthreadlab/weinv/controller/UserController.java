@@ -53,7 +53,7 @@ public class UserController {
             @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) throws IOException, URISyntaxException {
 
-        log.info("[registerWeddingResponsible] - request: {}", request.getRequestURI());
+        log.info("[register wedding responsible] - request: {}", request.getRequestURI());
         String uuid = userService.registerWeddingResponsible(jwtDetails, userRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{uuid}").buildAndExpand(uuid).toUri();
         return ResponseEntity.created(location).build();
@@ -77,7 +77,7 @@ public class UserController {
             @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) {
 
-        log.info("[GetUser] request: {}", request.getRequestURI());
+        log.info("[get user] request: {}", request.getRequestURI());
         UserResponse userResponse = userService.getUser(uuid);
         return ResponseEntity.ok().body(userResponse);
     }

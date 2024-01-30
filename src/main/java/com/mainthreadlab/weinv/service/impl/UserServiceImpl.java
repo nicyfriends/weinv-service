@@ -169,33 +169,31 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public String registerWeddingResponsible(JwtDetails jwtDetails, UserRequest userRequest) {
-        log.info("[registerWeddingResponsible] - start: username={}", userRequest.getUsername());
+        log.info("[register wedding responsible] - start: username={}", userRequest.getUsername());
 
         // in order to simplify user usage
-        userRequest.setUsername(userRequest.getUsername().trim().toLowerCase());
-        userRequest.setPassword(userRequest.getPassword().trim().toLowerCase());
+        userRequest.setUsername(Utils.toLowerCase(userRequest.getUsername()));
+        userRequest.setPassword(Utils.toLowerCase(userRequest.getPassword()));
         userRequest.setFirstName(StringUtils.capitalize(userRequest.getFirstName()));
         userRequest.setLastName(StringUtils.capitalize(userRequest.getLastName()));
 
-        log.info("[registerWeddingResponsible] - save in weinv");
+        log.info("[register wedding responsible] - save in weinv");
         userRequest.setRole(Role.USER);
         if (userRequest.getPrice() == null) userRequest.setPrice(0D);
         User user = save(userRequest);
 
-        log.info("[registerWeddingResponsible] - save in authorization-server");
+        log.info("[register wedding responsible] - save in authorization-server");
         AuthUserRequest authUserRequest = mapper.toAuthUser(userRequest);
         customUserDetailsService.addUserDetails(authUserRequest);
 
-        String template = Utils.readFileFromResource(enAccountCreationBodyFilePath);
-        if (Language.FR.equals(user.getLanguage())) {
-            template = Utils.readFileFromResource(frAccountCreationBodyFilePath);
-        }
-        template = template.replace("{username}", userRequest.getUsername()).replace("{password}", userRequest.getPassword());
+        String template = Utils.readFileFromResource(frAccountCreationBodyFilePath)
+                .replace("{username}", userRequest.getUsername())
+                .replace("{password}", userRequest.getPassword());
 
         emailSender.sendHtmlEmail(user.getEmail(), accountCreationSubject, template);
         emailSender.sendHtmlEmail(jwtDetails.getEmail(), accountCreationSubject, template);
 
-        log.info("[registerWeddingResponsible] - success: username={}", userRequest.getUsername());
+        log.info("[register wedding responsible] - end");
         return user.getUuid();
     }
 
@@ -239,15 +237,15 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isBlank(userRequest.getPhoneNumber())) {
             userRequest.setPhoneNumber("+243");  // default country code
         }
-        userRequest.setUsername(userRequest.getUsername().trim().toLowerCase());
-        userRequest.setPassword(userRequest.getPassword().trim().toLowerCase());
+        userRequest.setUsername(Utils.toLowerCase(userRequest.getUsername()));
+        userRequest.setPassword(Utils.toLowerCase(userRequest.getPassword()));
         return userRepository.save(mapper.toEntity(userRequest));
     }
 
     @Override
     @Transactional
     public UserResponse getUser(String uuid) {
-        log.info("[GetUser] - start: uuid={}", uuid);
+        log.info("[get user] - start: uuid={}", uuid);
 
         UserResponse userResponse = null;
         User user = getByUuid(uuid);
@@ -259,7 +257,7 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        log.info("[GetUser] - end");
+        log.info("[get user] - end");
         return userResponse;
 
     }

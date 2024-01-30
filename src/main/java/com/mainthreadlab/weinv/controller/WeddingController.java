@@ -51,18 +51,12 @@ public class WeddingController {
 
 
     @PostMapping()
-    @Operation(
-            operationId = "createWedding",
-            summary = "create a wedding event",
-            tags = {"Wedding"},
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)), headers = @Header(name = HttpHeaders.LOCATION, schema = @Schema(implementation = URI.class))),
-                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "409", description = "Conflict", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-            }
-    )
+    @Operation(operationId = "createWedding", summary = "create a wedding event", tags = {"Wedding"}, responses = {
+            @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)), headers = @Header(name = HttpHeaders.LOCATION, schema = @Schema(implementation = URI.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Conflict", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     public ResponseEntity<String> createWedding(
             @Valid @RequestBody WeddingRequest weddingRequest,
             HttpServletRequest request) {
@@ -155,16 +149,10 @@ public class WeddingController {
 
 
     @GetMapping("/all")
-    @Operation(
-            operationId = "getWeddings",
-            summary = "get all weddings",
-            tags = {"Wedding"},
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok"),
-                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-            }
-    )
+    @Operation(operationId = "getWeddings", summary = "get all weddings", tags = {"Wedding"}, responses = {
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     public ResponseEntity<List<WeddingResponse>> getWeddings(
             @RequestParam(required = false, defaultValue = "0") int offset,
             @RequestParam(required = false, defaultValue = "10") int limit,
@@ -178,17 +166,11 @@ public class WeddingController {
 
 
     @PatchMapping("/{uuid}")
-    @Operation(
-            operationId = "updateWedding",
-            summary = "update wedding",
-            tags = {"Wedding"},
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok"),
-                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-            }
-    )
+    @Operation(operationId = "updateWedding", summary = "update wedding", tags = {"Wedding"}, responses = {
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     public ResponseEntity<Void> updateWedding(
             @PathVariable String uuid,
             @RequestBody WeddingUpdateRequest weddingRequest,
@@ -203,10 +185,10 @@ public class WeddingController {
 
     @DeleteMapping("/{uuid}")
     @Operation(operationId = "deleteWedding", summary = "delete wedding", tags = {"Wedding"}, responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok"),
-                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     public ResponseEntity<Void> deleteWedding(
             @PathVariable String uuid,
             HttpServletRequest request) {
@@ -218,23 +200,17 @@ public class WeddingController {
 
 
     @GetMapping("/{uuid}/downloadPdf")
-    @Operation(
-            operationId = "downloadPdf",
-            summary = "download pdf file that contains wedding information along with guest list",
-            tags = {"Wedding"},
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Ok"),
-                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-            }
-    )
+    @Operation(operationId = "downloadPdf", summary = "download pdf file that contains wedding information along with guest list", tags = {"Wedding"}, responses = {
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     public void downloadPdf(
             @PathVariable String uuid,
-            HttpServletRequest request, HttpServletResponse httpResponse) throws DocumentException, IOException {
+            HttpServletRequest request,
+            HttpServletResponse httpResponse) throws DocumentException, IOException {
 
         log.info("[download pdf] - request: {}", request.getRequestURI());
-
         httpResponse.setContentType("application/pdf");
         httpResponse.setHeader("Content-disposition", "attachment; filename=invités.pdf");
         weddingService.downloadPdf(uuid, httpResponse);

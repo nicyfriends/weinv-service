@@ -145,6 +145,8 @@ public class WeddingServiceImpl implements WeddingService {
         }
 
         request.setEventType(wedding.getEventType());
+        request.setFirstName(StringUtils.capitalize(request.getFirstName()));
+        request.setLastName(StringUtils.capitalize(request.getLastName()));
         User user = userService.save(request);
 
         invitationRepository.save(invitationMapper.toEntity(wedding, user, request));
@@ -278,7 +280,7 @@ public class WeddingServiceImpl implements WeddingService {
     }
 
     private void updateWeddingPrice(WeddingUpdateRequest weddingRequest, JwtDetails jwtDetails, User responsible) {
-        log.info("[updateWeddingPrice] - start");
+        log.info("[update wedding price] - start");
 
         if (jwtDetails != null && jwtDetails.getAuthorities() != null && !jwtDetails.getAuthorities().isEmpty()) {
             List<String> authorities = jwtDetails.getAuthorities();
@@ -286,11 +288,11 @@ public class WeddingServiceImpl implements WeddingService {
                 responsible.setPrice(weddingRequest.getPrice());
             }
         }
-        log.info("[updateWeddingPrice] - end");
+        log.info("[update wedding price] - end");
     }
 
     private void responsiblePwdRecovery(WeddingUpdateRequest weddingRequest, JwtDetails jwtDetails, User responsible) {
-        log.info("[responsiblePwdRecovery] - start");
+        log.info("[responsible password recovery] - start");
 
         if (jwtDetails != null && jwtDetails.getAuthorities() != null && !jwtDetails.getAuthorities().isEmpty()) {
             List<String> authorities = jwtDetails.getAuthorities();
@@ -298,7 +300,7 @@ public class WeddingServiceImpl implements WeddingService {
                 customUserDetailsService.responsiblePwdRecovery(responsible.getUsername(), weddingRequest.getResponsibleNewPassword());
             }
         }
-        log.info("[responsiblePwdRecovery] - end");
+        log.info("[responsible password recovery] - end");
     }
 
     @Override
