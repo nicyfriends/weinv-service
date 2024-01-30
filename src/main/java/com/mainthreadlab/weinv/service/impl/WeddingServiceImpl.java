@@ -196,10 +196,10 @@ public class WeddingServiceImpl implements WeddingService {
                 predicates.add(criteriaBuilder.equal(root.get(INVITATION_STATUS_FIELD), invitationStatus));
             }
             if (StringUtils.isNotBlank(searchKeyword)) {
-                String keyword = LIKE_KEYWORD_FORMAT.replace("keyword", searchKeyword);
+                String keyword = LIKE_KEYWORD_FORMAT.replace("keyword", Utils.toLowerCase(searchKeyword));
                 predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get(GUEST_FIELD).get(USERNAME_FIELD), keyword),
-                        criteriaBuilder.like(root.get(GUEST_FIELD).get(FIRSTNAME_FIELD), keyword),
-                        criteriaBuilder.like(root.get(GUEST_FIELD).get(LASTNAME_FIELD), keyword)));
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get(GUEST_FIELD).get(FIRSTNAME_FIELD)), keyword),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get(GUEST_FIELD).get(LASTNAME_FIELD)), keyword)));
             }
             predicates.add(criteriaBuilder.isTrue(root.get(GUEST_FIELD).get(ENABLED_FIELD)));
             return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
