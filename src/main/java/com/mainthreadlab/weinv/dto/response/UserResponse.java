@@ -18,7 +18,6 @@ public class UserResponse {
     private String firstName;
     private String wife;
     private String husband;
-    private boolean couple;
     private String phoneNumber;
     private String email;
     private List<String> roles;

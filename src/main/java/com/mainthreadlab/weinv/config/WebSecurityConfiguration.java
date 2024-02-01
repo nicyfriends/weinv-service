@@ -32,7 +32,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/webjars/**",
             "/auth/**",
             "/contact-us",
-            "/weddings/all",
+            "/events/all",
             "/actuator/**",
             "/error",
             "**/oauth/token**"

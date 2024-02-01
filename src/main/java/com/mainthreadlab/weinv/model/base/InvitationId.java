@@ -16,8 +16,8 @@ import java.io.Serializable;
 @AllArgsConstructor(staticName = "of")
 public class InvitationId implements Serializable {
 
-    @Column(name = "wedding_uuid", nullable = false)
-    private String weddingUuid;
+    @Column(name = "event_uuid", nullable = false)
+    private String eventUuid;
 
     @Column(name = "guest_uuid", nullable = false)
     private String guestUuid;

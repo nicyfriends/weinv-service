@@ -19,8 +19,8 @@ public class Constants {
     public static final String USERNAME_FIELD = "username";
     public static final String LASTNAME_FIELD = "lastName";
     public static final String FIRSTNAME_FIELD = "firstName";
-    public static final String WEDDING_FIELD = "wedding";
-    public static final String WEDDING_DATE_FIELD = "date";
+    public static final String EVENT_FIELD = "event";
+    public static final String EVENT_DATE_FIELD = "date";
     public static final String UUID_FIELD = "uuid";
     public static final String ENABLED_FIELD = "enabled";
     public static final String LIKE_KEYWORD_FORMAT = "%keyword%";

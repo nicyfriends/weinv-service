@@ -16,7 +16,7 @@ public interface InvitationMapper {
     default Invitation toEntity(Event event, User guest, UserRequest request) {
         Invitation invitation = new Invitation();
         InvitationId invitationId = new InvitationId();
-        invitationId.setWeddingUuid(event.getUuid());
+        invitationId.setEventUuid(event.getUuid());
         invitationId.setGuestUuid(guest.getUuid());
         invitation.setId(invitationId);
         invitation.setEvent(event);
@@ -36,14 +36,11 @@ public interface InvitationMapper {
         invitationResponse.setEmail(invitation.getGuest().getEmail());
         invitationResponse.setFirstName(invitation.getGuest().getFirstName());
         invitationResponse.setLastName(invitation.getGuest().getLastName());
-        invitationResponse.setHusband(invitation.getGuest().getHusband());
-        invitationResponse.setWife(invitation.getGuest().getWife());
-        invitationResponse.setCouple(invitation.getGuest().isCouple());
         invitationResponse.setPhoneNumber(invitation.getGuest().getPhoneNumber());
         invitationResponse.setTableNumber(invitation.getTableNumber());
         invitationResponse.setUsername(invitation.getGuest().getUsername());
         invitationResponse.setUuid(invitation.getGuest().getUuid());
-        invitationResponse.setUuidWedding(invitation.getEvent().getUuid());
+        invitationResponse.setUuidEvent(invitation.getEvent().getUuid());
         invitationResponse.setEventType(invitation.getGuest().getEventType());
         invitationResponse.setTotalInvitations(invitation.getTotalInvitations());
         return invitationResponse;

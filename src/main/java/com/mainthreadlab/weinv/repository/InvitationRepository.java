@@ -14,11 +14,11 @@ import java.util.List;
 public interface InvitationRepository extends JpaRepository<Invitation, InvitationId>, JpaSpecificationExecutor<Invitation> {
 
 
-    List<Invitation> findByWedding(Event event);
+    List<Invitation> findByEvent(Event event);
 
-    List<Invitation> findByWeddingOrderByGuest_FirstNameAscGuest_LastNameAsc(Event event);
+    List<Invitation> findByEventOrderByGuest_FirstNameAscGuest_LastNameAsc(Event event);
 
-    Invitation findByWeddingAndGuest(Event event, User guest);
+    Invitation findByEventAndGuest(Event event, User guest);
 
     Invitation findByGuest(User user);
 

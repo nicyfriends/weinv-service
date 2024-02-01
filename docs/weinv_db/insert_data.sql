@@ -7,7 +7,7 @@ INSERT INTO public.authorities (created_at,created_by,updated_at,updated_by,"nam
 
 
 INSERT INTO public.oauth_client_details (client_id,access_token_validity,additional_information,authorities,authorized_grant_types,autoapprove,client_secret,refresh_token_validity,resource_ids,"scope",web_server_redirect_uri) VALUES
-	 ('weinv',3600000,'{}','client','password,refresh_token,client_credentials',true,'$2a$12$OHkz3bL4lceeK7MdvhwQye7zyYQ0T1yw5JfzADhbfuNRtRLakf.xa',3600000,'WEDDING-INVITATION','read,write','https://weinv-services.cleverapps.io/weinv/login');
+	 ('weinv',3600000,'{}','client','password,refresh_token,client_credentials',true,'$2a$12$OHkz3bL4lceeK7MdvhwQye7zyYQ0T1yw5JfzADhbfuNRtRLakf.xa',3600000,'EVENT-INVITATION','read,write','https://weinv-services.cleverapps.io/weinv/login');
 
 
 INSERT INTO public.user_authority (username,authority_name) VALUES

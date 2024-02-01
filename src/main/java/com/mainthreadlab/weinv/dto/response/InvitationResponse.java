@@ -17,7 +17,6 @@ public class InvitationResponse {
     private String firstName;
     private String wife;
     private String husband;
-    private boolean couple;
     private String phoneNumber;
     private String email;
     private List<String> roles;
@@ -26,6 +25,6 @@ public class InvitationResponse {
     private EventType eventType;
     private Integer totalInvitations;
     private InvitationStatus status;
-    private String uuidWedding;
+    private String uuidEvent;
 
 }

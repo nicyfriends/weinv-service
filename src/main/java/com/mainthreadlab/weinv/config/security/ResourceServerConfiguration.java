@@ -23,7 +23,7 @@ import java.util.Collections;
 @EnableResourceServer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
-    private static final String RESOURCE_ID = "WEDDING-INVITATION";
+    private static final String RESOURCE_ID = "EVENT-INVITATION";
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final AccessDeniedHandler accessDeniedHandler;
     private final String contextPath;

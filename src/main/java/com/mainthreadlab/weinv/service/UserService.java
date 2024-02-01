@@ -15,16 +15,16 @@ public interface UserService {
 
     LoginResponse login(CredentialsRequest credentialsRequest) throws URISyntaxException, IOException;
 
-    String registerWeddingResponsible(JwtDetails jwtDetails, UserRequest userRequest);
+    String registerEventResponsible(JwtDetails jwtDetails, UserRequest userRequest);
 
     User save(UserRequest userRequest);
 
-    void deleteGuestInvitation(String uuid, String uuidWedding);
+    void deleteGuestInvitation(String uuid, String uuidEvent);
 
     UserResponse getUser(String uuid);
 
     User getByUuid(String responsibleUUID);
 
-    void updateUser(String uuid, String uuidWedding, UpdateUserRequest updateUserRequest) throws URISyntaxException;
+    void updateUser(String uuid, String uuidEvent, UpdateUserRequest updateUserRequest) throws URISyntaxException;
 
 }

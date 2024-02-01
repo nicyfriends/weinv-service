@@ -23,8 +23,8 @@ public class Invitation extends BaseEntity {
 
     @ManyToOne
     @ToString.Exclude
-    @JoinColumn(name = "wedding_uuid", referencedColumnName = "uuid", foreignKey = @ForeignKey(name = "fk_wedding_guest_w"), insertable = false, updatable = false)
-    //@MapsId("weddingUuid")
+    @JoinColumn(name = "event_uuid", referencedColumnName = "uuid", foreignKey = @ForeignKey(name = "fk_wedding_guest_w"), insertable = false, updatable = false)
+    //@MapsId("eventUuid")
     private Event event;
 
     @ManyToOne

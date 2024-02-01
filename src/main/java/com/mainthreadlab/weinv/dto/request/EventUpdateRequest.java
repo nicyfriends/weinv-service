@@ -14,7 +14,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class WeddingUpdateRequest {
+public class EventUpdateRequest {
 
     private WeddingCategory type;
 

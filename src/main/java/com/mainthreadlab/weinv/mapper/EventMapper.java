@@ -1,10 +1,9 @@
 package com.mainthreadlab.weinv.mapper;
 
 import com.mainthreadlab.weinv.commons.Utils;
-import com.mainthreadlab.weinv.dto.request.WeddingRequest;
-import com.mainthreadlab.weinv.dto.response.WeddingResponse;
+import com.mainthreadlab.weinv.dto.request.EventRequest;
+import com.mainthreadlab.weinv.dto.response.EventResponse;
 import com.mainthreadlab.weinv.model.Event;
-import com.mainthreadlab.weinv.model.enums.Language;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
@@ -32,17 +31,17 @@ public abstract class EventMapper {
     //@Mapping(target = "uuid", expression = "java(UUID.randomUUID().toString())")
     @Mapping(target = "responsible", ignore = true)
     @Mapping(target = "spousesImage", ignore = true)
-    public abstract Event toEntity(WeddingRequest weddingRequest);
+    public abstract Event toEntity(EventRequest eventRequest);
 
     @Mapping(target = "ceremonyStartime", ignore = true)
     @Mapping(target = "receptionStartime", ignore = true)
     @Mapping(target = "spousesImage", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "responsibleUUID", source = "event.responsible.uuid")
-    public abstract WeddingResponse toModel(Event event, Integer numberOfSeatsTaken);
+    public abstract EventResponse toModel(Event event, Integer numberOfSeatsTaken);
 
     @AfterMapping
-    void setAfterMappingToEntity(WeddingRequest source, @MappingTarget Event target) {
+    void setAfterMappingToEntity(EventRequest source, @MappingTarget Event target) {
         target.setUuid(UUID.randomUUID().toString());
         if (source.getSpousesImage() != null) {
             target.setSpousesImage(source.getSpousesImage().getBytes(StandardCharsets.UTF_8));
@@ -59,7 +58,7 @@ public abstract class EventMapper {
     }
 
     @AfterMapping
-    void setAfterMappingToModel(Event event, Integer numberOfSeatsTaken, @MappingTarget WeddingResponse target) {
+    void setAfterMappingToModel(Event event, Integer numberOfSeatsTaken, @MappingTarget EventResponse target) {
         if (event.getCeremonyStartime() != null) {
             target.setCeremonyStartime(new SimpleDateFormat("HH:mm").format(event.getCeremonyStartime()));
         }

@@ -15,7 +15,7 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class WeddingRequest {
+public class EventRequest {
 
     //@NotNull(message = "must not be empty or null")
     private WeddingCategory type;

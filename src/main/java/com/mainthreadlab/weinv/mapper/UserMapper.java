@@ -29,14 +29,8 @@ public interface UserMapper {
         user.setLanguage(userRequest.getLanguage() != null ? userRequest.getLanguage() : Language.FR);
         user.setRoles(userRequest.getRole() != null ? userRequest.getRole().getDescription() : Role.GUEST.getDescription());
         user.setPrice(userRequest.getPrice());  // only for responsible
-        if (userRequest.isCouple()) {
-            user.setHusband(userRequest.getHusband());
-            user.setWife(userRequest.getWife());
-            user.setCouple(userRequest.isCouple());
-        } else {
-            user.setFirstName(userRequest.getFirstName());
-            user.setLastName(userRequest.getLastName());
-        }
+        user.setFirstName(userRequest.getFirstName());
+        user.setLastName(userRequest.getLastName());
         user.setEnabled(true);
         return user;
     }
@@ -46,9 +40,6 @@ public interface UserMapper {
         return new UserResponse()
                 .setFirstName(user.getFirstName())
                 .setLastName(user.getLastName())
-                .setHusband(user.getHusband())
-                .setWife(user.getWife())
-                .setCouple(user.isCouple())
                 .setLanguage(user.getLanguage().name())
                 .setEmail(user.getEmail())
                 .setPhoneNumber(user.getPhoneNumber())

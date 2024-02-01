@@ -4,11 +4,11 @@ import com.itextpdf.text.DocumentException;
 import com.mainthreadlab.weinv.config.security.annotation.JwtDetails;
 import com.mainthreadlab.weinv.dto.request.UpdateInvitationRequest;
 import com.mainthreadlab.weinv.dto.request.UserRequest;
-import com.mainthreadlab.weinv.dto.request.WeddingRequest;
-import com.mainthreadlab.weinv.dto.request.WeddingUpdateRequest;
+import com.mainthreadlab.weinv.dto.request.EventRequest;
+import com.mainthreadlab.weinv.dto.request.EventUpdateRequest;
+import com.mainthreadlab.weinv.dto.response.EventResponse;
 import com.mainthreadlab.weinv.dto.response.InvitationResponse;
 import com.mainthreadlab.weinv.dto.response.ResponsePage;
-import com.mainthreadlab.weinv.dto.response.WeddingResponse;
 import com.mainthreadlab.weinv.model.Event;
 import com.mainthreadlab.weinv.model.User;
 import com.mainthreadlab.weinv.model.enums.InvitationStatus;
@@ -21,23 +21,23 @@ import java.util.List;
 
 public interface EventService {
 
-    String createWedding(WeddingRequest weddingRequest);
+    String createEvent(EventRequest eventRequest);
 
     void invite(String uuid, UserRequest userRequest) throws URISyntaxException, IOException;
 
-    WeddingResponse getWedding(String uuid);
+    EventResponse getEvent(String uuid);
 
-    ResponsePage<InvitationResponse> getWeddingInvitations(String uuidWedding, String searchKeyword, Pageable pageable, InvitationStatus invitationStatus);
+    ResponsePage<InvitationResponse> getEventInvitations(String uuidEvent, String searchKeyword, Pageable pageable, InvitationStatus invitationStatus);
 
-    List<WeddingResponse> getWeddings(Pageable pageable);
+    List<EventResponse> getEvents(Pageable pageable);
 
-    void updateWedding(String uuid, WeddingUpdateRequest weddingRequest, JwtDetails jwtDetails);
+    void updateEvent(String uuid, EventUpdateRequest weddingRequest, JwtDetails jwtDetails);
 
-    void deleteWedding(String uuid);
+    void deleteEvent(String uuid);
 
-    void updateInvitationStatus(UpdateInvitationRequest updateInvitationRequest, String uuidWedding, String uuidGuest);
+    void updateInvitationStatus(UpdateInvitationRequest updateInvitationRequest, String uuidEvent, String uuidGuest);
 
-    void downloadPdf(String uuidWedding, HttpServletResponse httpResponse) throws DocumentException, IOException;
+    void downloadPdf(String uuidEvent, HttpServletResponse httpResponse) throws DocumentException, IOException;
 
     Event getByResponsible(User responsible);
 

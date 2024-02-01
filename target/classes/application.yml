@@ -103,7 +103,7 @@ weinv:
 
   job:
     delete:
-      weddings:
+      events:
         size: "10"
         deletionCronExpression: 0 0/5 * * * ? #0 0/10 * * * ?: 10min #0 0/1 * * * ?: every minute; 0 0 1 * * ?: every day at 1am
 
@@ -147,14 +147,14 @@ weinv:
 
   mail:
     account:
-      wedding-responsible:
+      event-responsible:
         subject: "WEINV account created"
         body:
           en: templates/en/account_created.html
           fr: templates/fr/account_created.html
     events:
-      wedding:
-        subject: "WEINV wedding invitation"
+      event:
+        subject: "WEINV event invitation"
         body:
           en: templates/en/mail_invitation.html
           fr: templates/fr/mail_invitation.html

@@ -42,19 +42,19 @@ public class UserController {
 
 
     @PostMapping("/register")
-    @Operation(operationId = "registerWeddingResponsible", summary = "Register a responsible for an event (only 'admin' can do that)", tags = {"User"}, responses = {
+    @Operation(operationId = "registerEventResponsible", summary = "Register a responsible for an event (only 'admin' can do that)", tags = {"User"}, responses = {
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)), headers = @Header(name = HttpHeaders.LOCATION, schema = @Schema(implementation = URI.class))),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "Conflict", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
-    public ResponseEntity<Void> registerWeddingResponsible(
+    public ResponseEntity<Void> registerEventResponsible(
             @Valid @RequestBody UserRequest userRequest,
             @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) throws IOException, URISyntaxException {
 
-        log.info("[register wedding responsible] - request: {}", request.getRequestURI());
-        String uuid = userService.registerWeddingResponsible(jwtDetails, userRequest);
+        log.info("[register event responsible] - request: {}", request.getRequestURI());
+        String uuid = userService.registerEventResponsible(jwtDetails, userRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{uuid}").buildAndExpand(uuid).toUri();
         return ResponseEntity.created(location).build();
     }
@@ -83,7 +83,7 @@ public class UserController {
     }
 
 
-    // used by the responsible for wedding to update its account data or guest info's
+    // used by the responsible for event to update its account data or guest info's
     @PatchMapping("/{uuid}")
     @Operation(
             operationId = "updateUser",
@@ -99,13 +99,13 @@ public class UserController {
     )
     public ResponseEntity<Void> updateUser(
             @PathVariable String uuid,
-            @RequestParam(required = false) String uuidWedding,
+            @RequestParam(required = false) String uuidEvent,
             @Valid @RequestBody UpdateUserRequest updateUserRequest,
             @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) throws URISyntaxException {
 
         log.info("[update user] request: {}", request.getRequestURI());
-        userService.updateUser(uuid, uuidWedding, updateUserRequest);
+        userService.updateUser(uuid, uuidEvent, updateUserRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -119,12 +119,12 @@ public class UserController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     public ResponseEntity<Void> deleteGuestInvitation(
             @PathVariable String uuid,
-            @RequestParam(required = false) String uuidWedding,
+            @RequestParam(required = false) String uuidEvent,
             @JwtUserClaims JwtDetails jwtDetails,
             HttpServletRequest request) throws URISyntaxException {
 
         log.info("[delete guest invitation] request: {}", request.getRequestURI());
-        userService.deleteGuestInvitation(uuid, uuidWedding);
+        userService.deleteGuestInvitation(uuid, uuidEvent);
         return ResponseEntity.ok().build();
     }
 

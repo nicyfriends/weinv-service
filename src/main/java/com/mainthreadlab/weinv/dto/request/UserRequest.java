@@ -26,11 +26,6 @@ public class UserRequest {
     //@NotBlank(message = "must not be empty or null")
     private String firstName;
 
-    /**  couple information */
-    private String wife;
-    private String husband;
-    private boolean couple;
-
     @ContactNumberConstraint
     /** only italy mobile phone */
     //@NotBlank(message = "must not be empty or null")

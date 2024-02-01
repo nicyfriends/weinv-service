@@ -21,7 +21,7 @@ public class LoginResponse {
 
     private String uuidUser;
 
-    private String uuidWedding;    // for guest/responsible
+    private String uuidEvent;    // for guest/responsible
 
     private List<String> roles;
     private String firstName;

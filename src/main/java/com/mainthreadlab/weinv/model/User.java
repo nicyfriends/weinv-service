@@ -37,11 +37,6 @@ public class User extends BaseEntity {
     //@Column(nullable = false)
     private String lastName;
 
-    /** couple information */
-    private String wife;
-    private String husband;
-    private boolean couple;
-
     private String email;
     private String phoneNumber;
 

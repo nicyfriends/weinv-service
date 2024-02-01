@@ -106,27 +106,27 @@ public class WeinvConfiguration {
 //        responsible.setUsername(responsible.getFirstName());   //  + rand.nextInt(20)
 //        responsible = userRepository.save(responsible);
 //
-//        Wedding wedding = new Wedding();
-//        wedding.setUuid(UUID.randomUUID().toString());
-//        wedding.setResponsible(responsible);
-//        wedding.setDate(Date.from(LocalDate.now().plusMonths(6).atStartOfDay(ZoneId.systemDefault()).toInstant()));
-//        wedding.setDescription("Alessandro et Christelle Mariage");
-//        wedding.setCeremonyStartime(Date.from(LocalDateTime.now().plusMonths(6).plusHours(3).atZone(ZoneId.systemDefault()).toInstant()));
-//    wedding.setCeremonyVenue("Eglise C.R.S, 3, avenue Lokango, Barumbu, Kinshasa");
-//    wedding.setHusbandName("Alessandro");
-//    wedding.setWifeName("Christelle");
-//    wedding.setMaxReceptionSeats(500);
-//    wedding.setReceptionStartime(Date.from(LocalDateTime.now().plusMonths(6).plusHours(8).atZone(ZoneId.systemDefault()).toInstant()));
-//    wedding.setReceptionVenue("Salle Royale, 12, avenue Faradje, Kasa-Vubu, Kinshasa");
-//        wedding.setDeadlineConfirmInvitation(Date.from(LocalDate.now().plusMonths(5).atStartOfDay(ZoneId.systemDefault()).toInstant()));
-//        wedding = weddingRepository.save(wedding);
+//        Event event = new Event();
+//        event.setUuid(UUID.randomUUID().toString());
+//        event.setResponsible(responsible);
+//        event.setDate(Date.from(LocalDate.now().plusMonths(6).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+//        event.setDescription("Alessandro et Christelle Mariage");
+//        event.setCeremonyStartime(Date.from(LocalDateTime.now().plusMonths(6).plusHours(3).atZone(ZoneId.systemDefault()).toInstant()));
+//    event.setCeremonyVenue("Eglise C.R.S, 3, avenue Lokango, Barumbu, Kinshasa");
+//    event.setHusbandName("Alessandro");
+//    event.setWifeName("Christelle");
+//    event.setMaxReceptionSeats(500);
+//    event.setReceptionStartime(Date.from(LocalDateTime.now().plusMonths(6).plusHours(8).atZone(ZoneId.systemDefault()).toInstant()));
+//    event.setReceptionVenue("Salle Royale, 12, avenue Faradje, Kasa-Vubu, Kinshasa");
+//        event.setDeadlineConfirmInvitation(Date.from(LocalDate.now().plusMonths(5).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+//        event = weddingRepository.save(event);
 //
 //        WeddingGuest weddingGuest = new WeddingGuest();
 //        weddingGuest.setGuest(guest);
-//        weddingGuest.setWedding(wedding);
+//        weddingGuest.setWedding(event);
 //        weddingGuest.setSeatNumber("15");
 //        WeddingGuestId weddingGuestId = new WeddingGuestId();
-//        weddingGuestId.setWeddingId(wedding.getId());
+//        weddingGuestId.setWeddingId(event.getId());
 //        weddingGuestId.setUserId(guest.getId());
 //        weddingGuest.setId(weddingGuestId);
 //        weddingGuestRepository.save(weddingGuest);

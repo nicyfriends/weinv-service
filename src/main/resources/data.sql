@@ -16,7 +16,7 @@
 ---- Access_token_validity: 20min
 ---- Refresh_token_validity: 8h
 --INSERT INTO oauth_client_details (resource_ids, client_id, client_secret, scope, authorized_grant_types, authorities, access_token_validity, refresh_token_validity, web_server_redirect_uri, additional_information)
---VALUES ('WEDDING-INVITATION', 'weinv', '$2a$12$5iyG9zrPNRhi8akByKeA/ez0nDiFocUMdmoiXe82iNk8xN7dbn..q', 'read,write', 'password,refresh_token,client_credentials', 'client', 1200, 28800, 'https://weinv-services.cleverapps.io/weinv/login', '{}');
+--VALUES ('EVENT-INVITATION', 'weinv', '$2a$12$5iyG9zrPNRhi8akByKeA/ez0nDiFocUMdmoiXe82iNk8xN7dbn..q', 'read,write', 'password,refresh_token,client_credentials', 'client', 1200, 28800, 'https://weinv-services.cleverapps.io/weinv/login', '{}');
 --
 ---- The encrypted password is `weinv1@admin.secret`
 --INSERT INTO users (id, username, password, email) VALUES (1, 'weinv.admin', '$2a$12$BtGQ9IDSmsYSfjofVeISre.Wlvrl9hvkvAW2GjAtFnr1bHVyAGhDG', 'malandanicy@gmail.com');

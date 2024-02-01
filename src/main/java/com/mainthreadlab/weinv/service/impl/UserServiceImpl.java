@@ -20,12 +20,12 @@ import com.mainthreadlab.weinv.model.Event;
 import com.mainthreadlab.weinv.model.Invitation;
 import com.mainthreadlab.weinv.model.User;
 import com.mainthreadlab.weinv.model.enums.Role;
+import com.mainthreadlab.weinv.repository.EventRepository;
 import com.mainthreadlab.weinv.repository.InvitationRepository;
 import com.mainthreadlab.weinv.repository.UserRepository;
-import com.mainthreadlab.weinv.repository.EventRepository;
 import com.mainthreadlab.weinv.service.EmailService;
-import com.mainthreadlab.weinv.service.UserService;
 import com.mainthreadlab.weinv.service.EventService;
+import com.mainthreadlab.weinv.service.UserService;
 import com.mainthreadlab.weinv.service.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,13 +74,13 @@ public class UserServiceImpl implements UserService {
     @Value("${weinv.client-secret}")
     private String clientSecret;
 
-    @Value("${weinv.mail.account.wedding-responsible.body.fr}")
+    @Value("${weinv.mail.account.event-responsible.body.fr}")
     private String frAccountCreationBodyFilePath;
 
-    @Value("${weinv.mail.account.wedding-responsible.body.en}")
+    @Value("${weinv.mail.account.event-responsible.body.en}")
     private String enAccountCreationBodyFilePath;
 
-    @Value("${weinv.mail.account.wedding-responsible.subject}")
+    @Value("${weinv.mail.account.event-responsible.subject}")
     private String accountCreationSubject;
 
 
@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (event != null && isSourceDateBeforeTargetDate(event.getDate(), new Date())) {
-            log.error("[login] - wedding date is expired, date={}", event.getDate());
+            log.error("[login] - event date is expired, date={}", event.getDate());
             throw new ForbiddenException();
         }
 
@@ -134,20 +134,20 @@ public class UserServiceImpl implements UserService {
 
             LoginResponse loginResponse = objectMapper.readValue(bodyString, LoginResponse.class);
 
-            String uuidWedding = null;
+            String uuidEvent = null;
             if (StringUtils.isNotBlank(user.getRoles())) {
                 List<String> roles = Arrays.asList(user.getRoles().split(","));
                 if (roles.contains(Role.USER.getDescription())) {
                     event = eventRepository.findByResponsible(user);
                     if (event != null) {
-                        uuidWedding = event.getUuid();
+                        uuidEvent = event.getUuid();
                     }
                 } else if (roles.contains(Role.GUEST.getDescription()) && invitation != null) {
-                    uuidWedding = invitation.getEvent().getUuid();
+                    uuidEvent = invitation.getEvent().getUuid();
                 }
             }
 
-            loginResponse.setUuidWedding(uuidWedding);
+            loginResponse.setUuidEvent(uuidEvent);
             loginResponse.setUuidUser(user.getUuid());
             loginResponse.setFirstName(user.getFirstName());
             loginResponse.setLastName(user.getLastName());
@@ -167,8 +167,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    public String registerWeddingResponsible(JwtDetails jwtDetails, UserRequest userRequest) {
-        log.info("[register wedding responsible] - start: username={}", userRequest.getUsername());
+    public String registerEventResponsible(JwtDetails jwtDetails, UserRequest userRequest) {
+        log.info("[register event responsible] - start: username={}", userRequest.getUsername());
 
         // in order to simplify user usage
         userRequest.setUsername(Utils.toLowerCase(userRequest.getUsername()));
@@ -176,12 +176,12 @@ public class UserServiceImpl implements UserService {
         userRequest.setFirstName(StringUtils.capitalize(userRequest.getFirstName()));
         userRequest.setLastName(StringUtils.capitalize(userRequest.getLastName()));
 
-        log.info("[register wedding responsible] - save in weinv");
+        log.info("[register event responsible] - save in weinv");
         userRequest.setRole(Role.USER);
         if (userRequest.getPrice() == null) userRequest.setPrice(0D);
         User user = save(userRequest);
 
-        log.info("[register wedding responsible] - save in authorization-server");
+        log.info("[register event responsible] - save in authorization-server");
         AuthUserRequest authUserRequest = mapper.toAuthUser(userRequest);
         customUserDetailsService.addUserDetails(authUserRequest);
 
@@ -192,14 +192,14 @@ public class UserServiceImpl implements UserService {
         emailSender.sendHtmlEmail(user.getEmail(), accountCreationSubject, template);
         emailSender.sendHtmlEmail(jwtDetails.getEmail(), accountCreationSubject, template);
 
-        log.info("[register wedding responsible] - end");
+        log.info("[register event responsible] - end");
         return user.getUuid();
     }
 
     @Override
     @Transactional
-    public void deleteGuestInvitation(String uuidUser, String uuidWedding) {
-        log.info("[delete guest invitation] - start: uuidUser={}, uuidWedding={}", uuidUser, uuidWedding);
+    public void deleteGuestInvitation(String uuidUser, String uuidEvent) {
+        log.info("[delete guest invitation] - start: uuidUser={}, uuidEvent={}", uuidUser, uuidEvent);
 
         User user = getByUuid(uuidUser);
         if (user == null) {
@@ -207,11 +207,11 @@ public class UserServiceImpl implements UserService {
             throw new ResourceNotFoundException(USER_NOT_FOUND);
         }
 
-        log.info("[delete guest invitation] - delete wedding invitation (if it exists)");
-        if (StringUtils.isNotBlank(uuidWedding)) {
-            Event event = eventRepository.findByUuid(uuidWedding);
+        log.info("[delete guest invitation] - delete event invitation (if it exists)");
+        if (StringUtils.isNotBlank(uuidEvent)) {
+            Event event = eventRepository.findByUuid(uuidEvent);
             if (event != null) {
-                Invitation invitation = invitationRepository.findByWeddingAndGuest(event, user);
+                Invitation invitation = invitationRepository.findByEventAndGuest(event, user);
                 invitationRepository.delete(invitation);
                 EventService.updateStatusInvitationNumber(event, invitation.getStatus(), invitation.getTotalInvitations(), "-");
             }
@@ -268,7 +268,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(String uuid, String uuidWedding, UpdateUserRequest request) {
+    public void updateUser(String uuid, String uuidEvent, UpdateUserRequest request) {
 
         String uuidFinal = StringUtils.isNotBlank(request.getUuid()) ? request.getUuid() : uuid;
         log.info("[update user] - start: uuid={}", uuidFinal);
@@ -281,9 +281,9 @@ public class UserServiceImpl implements UserService {
 
         // update in weinv
         if (Objects.nonNull(request.getTableNumber())) {
-            Event event = eventRepository.findByUuid(uuidWedding);
+            Event event = eventRepository.findByUuid(uuidEvent);
             if (event != null) {
-                Invitation invitation = invitationRepository.findByWeddingAndGuest(event, user);
+                Invitation invitation = invitationRepository.findByEventAndGuest(event, user);
                 if (invitation != null) {
                     invitation.setTableNumber(request.getTableNumber());
                     if (request.getTotalInvitations() != null) {
@@ -309,19 +309,12 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotBlank(request.getLastName())) {
             user.setLastName(StringUtils.capitalize(request.getLastName()));
         }
-        if (StringUtils.isNotBlank(request.getHusband())) {
-            user.setHusband(StringUtils.capitalize(request.getHusband()));
-        }
-        if (StringUtils.isNotBlank(request.getWife())) {
-            user.setWife(StringUtils.capitalize(request.getWife()));
-        }
         if (StringUtils.isNotBlank(request.getPhoneNumber())) {
             user.setPhoneNumber(request.getPhoneNumber());
         }
         if (request.getLanguage() != null) {
             user.setLanguage(request.getLanguage());
         }
-        user.setCouple(request.isCouple());
 
         AuthUpdateUserRequest authUpdateUserRequest = mapper.map(request);
         authUpdateUserRequest.setUsername(user.getUsername());
