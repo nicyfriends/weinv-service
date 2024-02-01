@@ -28,9 +28,6 @@ public abstract class EventMapper {
     @Value("${weinv.ui.default.invitation-other-text.fr}")
     private String defaultInvitationOtherTextFR;
 
-    @Value("${weinv.ui.default.invitation-other-text.en}")
-    private String defaultInvitationOtherTextEN;
-
 
     //@Mapping(target = "uuid", expression = "java(UUID.randomUUID().toString())")
     @Mapping(target = "responsible", ignore = true)
@@ -54,13 +51,10 @@ public abstract class EventMapper {
         try {
             if (StringUtils.isBlank(source.getInvitationOtherText())) {
                 String invitationOtherText = Utils.readFileFromResource(defaultInvitationOtherTextFR);
-                if (Language.EN.equals(source.getLanguage())) {
-                    invitationOtherText = Utils.readFileFromResource(defaultInvitationOtherTextEN);
-                }
                 target.setInvitationOtherText(invitationOtherText);
             }
         } catch (Exception ex) {
-            log.error("[setAfterMappingToEntity] error: {}", ex.getMessage(), ex);
+            log.error("[set after mapping to entity] error: {}", ex.getMessage(), ex);
         }
     }
 
