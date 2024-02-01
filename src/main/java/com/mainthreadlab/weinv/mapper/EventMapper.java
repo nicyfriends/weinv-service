@@ -1,10 +1,10 @@
 package com.mainthreadlab.weinv.mapper;
 
-import com.mainthreadlab.weinv.model.Event;
-import com.mainthreadlab.weinv.model.enums.Language;
+import com.mainthreadlab.weinv.commons.Utils;
 import com.mainthreadlab.weinv.dto.request.WeddingRequest;
 import com.mainthreadlab.weinv.dto.response.WeddingResponse;
-import com.mainthreadlab.weinv.commons.Utils;
+import com.mainthreadlab.weinv.model.Event;
+import com.mainthreadlab.weinv.model.enums.Language;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -40,7 +41,7 @@ public abstract class EventMapper {
     @Mapping(target = "receptionStartime", ignore = true)
     @Mapping(target = "spousesImage", ignore = true)
     @Mapping(target = "type", ignore = true)
-    @Mapping(target = "responsibleUUID", source = "wedding.responsible.uuid")
+    @Mapping(target = "responsibleUUID", source = "event.responsible.uuid")
     public abstract WeddingResponse toModel(Event event, Integer numberOfSeatsTaken);
 
     @AfterMapping
@@ -73,7 +74,7 @@ public abstract class EventMapper {
             target.setInvitationsAvailable(event.getMaxInvitations() - numberOfSeatsTaken);
         }
         if (event.getSpousesImage() != null) {
-            target.setSpousesImage(new String(event.getSpousesImage()));
+            target.setSpousesImage(Arrays.toString(event.getSpousesImage()));
         }
         target.setPrice(event.getResponsible().getPrice());
         target.setExpired(isSourceDateBeforeTargetDate(event.getDate(), new Date()));
