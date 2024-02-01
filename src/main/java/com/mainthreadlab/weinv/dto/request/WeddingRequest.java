@@ -1,7 +1,7 @@
 package com.mainthreadlab.weinv.dto.request;
 
 import com.mainthreadlab.weinv.model.enums.Language;
-import com.mainthreadlab.weinv.model.enums.WeddingType;
+import com.mainthreadlab.weinv.model.enums.WeddingCategory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +18,7 @@ import java.util.Date;
 public class WeddingRequest {
 
     //@NotNull(message = "must not be empty or null")
-    private WeddingType type;
+    private WeddingCategory type;
 
     @NotBlank(message = "must not be empty or null")
     private String invitationText;

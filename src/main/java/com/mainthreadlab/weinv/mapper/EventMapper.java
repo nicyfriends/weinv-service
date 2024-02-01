@@ -1,6 +1,6 @@
 package com.mainthreadlab.weinv.mapper;
 
-import com.mainthreadlab.weinv.model.Wedding;
+import com.mainthreadlab.weinv.model.Event;
 import com.mainthreadlab.weinv.model.enums.Language;
 import com.mainthreadlab.weinv.dto.request.WeddingRequest;
 import com.mainthreadlab.weinv.dto.response.WeddingResponse;
@@ -22,7 +22,7 @@ import static com.mainthreadlab.weinv.commons.Utils.isSourceDateBeforeTargetDate
 
 @Slf4j
 @Mapper(componentModel = "spring")
-public abstract class WeddingMapper {
+public abstract class EventMapper {
 
     @Value("${weinv.ui.default.invitation-other-text.fr}")
     private String defaultInvitationOtherTextFR;
@@ -34,17 +34,17 @@ public abstract class WeddingMapper {
     //@Mapping(target = "uuid", expression = "java(UUID.randomUUID().toString())")
     @Mapping(target = "responsible", ignore = true)
     @Mapping(target = "spousesImage", ignore = true)
-    public abstract Wedding toEntity(WeddingRequest weddingRequest);
+    public abstract Event toEntity(WeddingRequest weddingRequest);
 
     @Mapping(target = "ceremonyStartime", ignore = true)
     @Mapping(target = "receptionStartime", ignore = true)
     @Mapping(target = "spousesImage", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "responsibleUUID", source = "wedding.responsible.uuid")
-    public abstract WeddingResponse toModel(Wedding wedding, Integer numberOfSeatsTaken);
+    public abstract WeddingResponse toModel(Event event, Integer numberOfSeatsTaken);
 
     @AfterMapping
-    void setAfterMappingToEntity(WeddingRequest source, @MappingTarget Wedding target) {
+    void setAfterMappingToEntity(WeddingRequest source, @MappingTarget Event target) {
         target.setUuid(UUID.randomUUID().toString());
         if (source.getSpousesImage() != null) {
             target.setSpousesImage(source.getSpousesImage().getBytes(StandardCharsets.UTF_8));
@@ -64,23 +64,23 @@ public abstract class WeddingMapper {
     }
 
     @AfterMapping
-    void setAfterMappingToModel(Wedding wedding, Integer numberOfSeatsTaken, @MappingTarget WeddingResponse target) {
-        if (wedding.getCeremonyStartime() != null) {
-            target.setCeremonyStartime(new SimpleDateFormat("HH:mm").format(wedding.getCeremonyStartime()));
+    void setAfterMappingToModel(Event event, Integer numberOfSeatsTaken, @MappingTarget WeddingResponse target) {
+        if (event.getCeremonyStartime() != null) {
+            target.setCeremonyStartime(new SimpleDateFormat("HH:mm").format(event.getCeremonyStartime()));
         }
-        target.setReceptionStartime(new SimpleDateFormat("HH:mm").format(wedding.getReceptionStartime()));
-        if (wedding.getMaxInvitations() != null) {
-            target.setInvitationsAvailable(wedding.getMaxInvitations() - numberOfSeatsTaken);
+        target.setReceptionStartime(new SimpleDateFormat("HH:mm").format(event.getReceptionStartime()));
+        if (event.getMaxInvitations() != null) {
+            target.setInvitationsAvailable(event.getMaxInvitations() - numberOfSeatsTaken);
         }
-        if (wedding.getSpousesImage() != null) {
-            target.setSpousesImage(new String(wedding.getSpousesImage()));
+        if (event.getSpousesImage() != null) {
+            target.setSpousesImage(new String(event.getSpousesImage()));
         }
-        target.setPrice(wedding.getResponsible().getPrice());
-        target.setExpired(isSourceDateBeforeTargetDate(wedding.getDate(), new Date()));
-        target.setResponsibleUsername(wedding.getResponsible().getUsername());
+        target.setPrice(event.getResponsible().getPrice());
+        target.setExpired(isSourceDateBeforeTargetDate(event.getDate(), new Date()));
+        target.setResponsibleUsername(event.getResponsible().getUsername());
 
-        if (wedding.getType() != null) {
-            target.setType(wedding.getType().name());
+        if (event.getType() != null) {
+            target.setType(event.getType().name());
         }
     }
 }

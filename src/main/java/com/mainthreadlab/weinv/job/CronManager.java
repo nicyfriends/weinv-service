@@ -13,7 +13,7 @@
 //@Slf4j
 //@Setter
 //@Getter
-//public class DeleteWeddingsJob extends QuartzJobBean {
+//public class CronManager extends QuartzJobBean {
 //
 //    private UserService userService;
 //
@@ -22,13 +22,13 @@
 //    @Override
 //    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 //        try {
-//            log.info("[DeleteWeddingsJob] - Start");
+//            log.info("[job] - deleting weddings");
 //            AuthUpdateUserRequest test = new AuthUpdateUserRequest();
 //            test.setUsername("test");
 //            userService.callAuthServer(test, "", null);
-//            log.info("[DeleteWeddingsJob] - End");
+//            log.info("[job] - end");
 //        } catch (Throwable e) {
-//            log.error("[DeleteWeddingsJob] - Error: {}", e.getMessage(), e);
+//            log.error("[job] - error: {}", e.getMessage(), e);
 //        }
 //    }
 //

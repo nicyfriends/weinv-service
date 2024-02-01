@@ -1,7 +1,7 @@
 package com.mainthreadlab.weinv.repository;
 
 import com.mainthreadlab.weinv.model.User;
-import com.mainthreadlab.weinv.model.Wedding;
+import com.mainthreadlab.weinv.model.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 
 @Repository
-public interface WeddingRepository extends JpaRepository<Wedding, Integer>, JpaSpecificationExecutor<Wedding> {
+public interface EventRepository extends JpaRepository<Event, Integer>, JpaSpecificationExecutor<Event> {
 
-    Wedding findByUuidAndDateGreaterThanEqual(String uuid, Date now);
+    Event findByUuidAndDateGreaterThanEqual(String uuid, Date now);
 
-    Wedding findByUuid(String uuid);
+    Event findByUuid(String uuid);
 
-    Wedding findByResponsible(User user);
+    Event findByResponsible(User user);
 }

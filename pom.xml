@@ -14,7 +14,7 @@
 	<artifactId>weinv-services</artifactId>
 	<version>1.0</version>
 <!--	<packaging>war</packaging>-->
-	<name>wedding-invitation</name>
+	<name>event-invitation</name>
 
 	<description>Spring Boot project for event invitation</description>
 
@@ -239,7 +239,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>wedding-invitation-${project.version}</finalName>
+		<finalName>event-invitation-${project.version}</finalName>
 	</build>
 
 </project>

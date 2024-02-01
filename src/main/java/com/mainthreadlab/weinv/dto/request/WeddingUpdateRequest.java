@@ -1,7 +1,7 @@
 package com.mainthreadlab.weinv.dto.request;
 
 import com.mainthreadlab.weinv.model.enums.Language;
-import com.mainthreadlab.weinv.model.enums.WeddingType;
+import com.mainthreadlab.weinv.model.enums.WeddingCategory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class WeddingUpdateRequest {
 
-    private WeddingType type;
+    private WeddingCategory type;
 
     private String invitationText;
     private String invitationOtherText;

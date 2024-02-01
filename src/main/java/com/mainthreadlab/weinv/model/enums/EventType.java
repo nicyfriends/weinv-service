@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public enum EventType {
-    WEDDING, OTHERS;
+    WEDDING, BIRTHDAY;
 }

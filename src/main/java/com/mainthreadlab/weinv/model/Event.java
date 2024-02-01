@@ -1,7 +1,7 @@
 package com.mainthreadlab.weinv.model;
 
 import com.mainthreadlab.weinv.model.enums.EventType;
-import com.mainthreadlab.weinv.model.enums.WeddingType;
+import com.mainthreadlab.weinv.model.enums.WeddingCategory;
 import com.mainthreadlab.weinv.model.base.BaseEntity;
 import lombok.*;
 
@@ -13,8 +13,8 @@ import java.util.Date;
 @Getter
 @ToString
 @NoArgsConstructor
-@Table(name = "ws_weddings")
-public class Wedding extends BaseEntity {
+@Table(name = "ws_events")
+public class Event extends BaseEntity {
 
     @Id
 //    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "wedding_seq")
@@ -27,7 +27,7 @@ public class Wedding extends BaseEntity {
 
     //@Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private WeddingType type;
+    private WeddingCategory type;
 
     //@Column(nullable = false)
     private String wifeName;

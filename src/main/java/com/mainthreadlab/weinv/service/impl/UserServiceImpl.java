@@ -16,17 +16,16 @@ import com.mainthreadlab.weinv.exception.ResourceNotFoundException;
 import com.mainthreadlab.weinv.exception.UnauthorizedException;
 import com.mainthreadlab.weinv.exception.UniqueConstraintViolationException;
 import com.mainthreadlab.weinv.mapper.UserMapper;
+import com.mainthreadlab.weinv.model.Event;
 import com.mainthreadlab.weinv.model.Invitation;
 import com.mainthreadlab.weinv.model.User;
-import com.mainthreadlab.weinv.model.Wedding;
-import com.mainthreadlab.weinv.model.enums.Language;
 import com.mainthreadlab.weinv.model.enums.Role;
 import com.mainthreadlab.weinv.repository.InvitationRepository;
 import com.mainthreadlab.weinv.repository.UserRepository;
-import com.mainthreadlab.weinv.repository.WeddingRepository;
+import com.mainthreadlab.weinv.repository.EventRepository;
 import com.mainthreadlab.weinv.service.EmailService;
 import com.mainthreadlab.weinv.service.UserService;
-import com.mainthreadlab.weinv.service.WeddingService;
+import com.mainthreadlab.weinv.service.EventService;
 import com.mainthreadlab.weinv.service.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +58,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    private final WeddingRepository weddingRepository;
+    private final EventRepository eventRepository;
     private final InvitationRepository invitationRepository;
     private final ObjectMapper objectMapper;
     private final UserMapper mapper;
@@ -100,14 +99,14 @@ public class UserServiceImpl implements UserService {
             throw new ResourceNotFoundException(USER_NOT_FOUND);
         }
 
-        Wedding wedding = weddingRepository.findByResponsible(user);
+        Event event = eventRepository.findByResponsible(user);
         Invitation invitation = invitationRepository.findByGuest(user);
-        if (wedding == null && invitation != null) {
-            wedding = invitation.getWedding();
+        if (event == null && invitation != null) {
+            event = invitation.getEvent();
         }
 
-        if (wedding != null && isSourceDateBeforeTargetDate(wedding.getDate(), new Date())) {
-            log.error("[login] - wedding date is expired, date={}", wedding.getDate());
+        if (event != null && isSourceDateBeforeTargetDate(event.getDate(), new Date())) {
+            log.error("[login] - wedding date is expired, date={}", event.getDate());
             throw new ForbiddenException();
         }
 
@@ -139,12 +138,12 @@ public class UserServiceImpl implements UserService {
             if (StringUtils.isNotBlank(user.getRoles())) {
                 List<String> roles = Arrays.asList(user.getRoles().split(","));
                 if (roles.contains(Role.USER.getDescription())) {
-                    wedding = weddingRepository.findByResponsible(user);
-                    if (wedding != null) {
-                        uuidWedding = wedding.getUuid();
+                    event = eventRepository.findByResponsible(user);
+                    if (event != null) {
+                        uuidWedding = event.getUuid();
                     }
                 } else if (roles.contains(Role.GUEST.getDescription()) && invitation != null) {
-                    uuidWedding = invitation.getWedding().getUuid();
+                    uuidWedding = invitation.getEvent().getUuid();
                 }
             }
 
@@ -210,11 +209,11 @@ public class UserServiceImpl implements UserService {
 
         log.info("[delete guest invitation] - delete wedding invitation (if it exists)");
         if (StringUtils.isNotBlank(uuidWedding)) {
-            Wedding wedding = weddingRepository.findByUuid(uuidWedding);
-            if (wedding != null) {
-                Invitation invitation = invitationRepository.findByWeddingAndGuest(wedding, user);
+            Event event = eventRepository.findByUuid(uuidWedding);
+            if (event != null) {
+                Invitation invitation = invitationRepository.findByWeddingAndGuest(event, user);
                 invitationRepository.delete(invitation);
-                WeddingService.updateStatusInvitationNumber(wedding, invitation.getStatus(), invitation.getTotalInvitations(), "-");
+                EventService.updateStatusInvitationNumber(event, invitation.getStatus(), invitation.getTotalInvitations(), "-");
             }
         }
 
@@ -282,15 +281,15 @@ public class UserServiceImpl implements UserService {
 
         // update in weinv
         if (Objects.nonNull(request.getTableNumber())) {
-            Wedding wedding = weddingRepository.findByUuid(uuidWedding);
-            if (wedding != null) {
-                Invitation invitation = invitationRepository.findByWeddingAndGuest(wedding, user);
+            Event event = eventRepository.findByUuid(uuidWedding);
+            if (event != null) {
+                Invitation invitation = invitationRepository.findByWeddingAndGuest(event, user);
                 if (invitation != null) {
                     invitation.setTableNumber(request.getTableNumber());
                     if (request.getTotalInvitations() != null) {
-                        WeddingService.updateStatusInvitationNumber(wedding, invitation.getStatus(), invitation.getTotalInvitations(), "-");
+                        EventService.updateStatusInvitationNumber(event, invitation.getStatus(), invitation.getTotalInvitations(), "-");
                         invitation.setTotalInvitations(request.getTotalInvitations());
-                        WeddingService.updateStatusInvitationNumber(wedding, invitation.getStatus(), invitation.getTotalInvitations(), "+");
+                        EventService.updateStatusInvitationNumber(event, invitation.getStatus(), invitation.getTotalInvitations(), "+");
                     }
                 }
             }
