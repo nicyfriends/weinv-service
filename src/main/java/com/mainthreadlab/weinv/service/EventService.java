@@ -43,6 +43,8 @@ public interface EventService {
 
     Event getByUuid(String uuid);
 
+    String getEventImage(String uuid);
+
     static void updateStatusInvitationNumber(Event event, InvitationStatus status, Integer totalInvitations, String operation) {
         if ("-".equals(operation)) {
             switch (status) {
@@ -64,4 +66,5 @@ public interface EventService {
             }
         }
     }
+
 }

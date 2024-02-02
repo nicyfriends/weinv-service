@@ -66,9 +66,10 @@ public abstract class EventMapper {
         if (event.getMaxInvitations() != null) {
             target.setInvitationsAvailable(event.getMaxInvitations() - numberOfSeatsTaken);
         }
-        if (event.getSpousesImage() != null) {
-            target.setSpousesImage(new String(event.getSpousesImage()));
-        }
+        /** make call response faster*/
+//        if (event.getSpousesImage() != null) {
+//            target.setSpousesImage(new String(event.getSpousesImage()));
+//        }
         target.setPrice(event.getResponsible().getPrice());
         target.setExpired(isSourceDateBeforeTargetDate(event.getDate(), new Date()));
         target.setResponsibleUsername(event.getResponsible().getUsername());

@@ -121,6 +121,23 @@ public class EventController {
     }
 
 
+    @GetMapping("/{uuid}/image")
+    @Operation(operationId = "getEventImage", summary = "get event image", tags = {"event"}, responses = {
+            @ApiResponse(responseCode = "200", description = "Ok"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
+    public ResponseEntity<String> getEventImage(
+            @PathVariable String uuid,
+            HttpServletRequest request) {
+
+        log.info("[get event image] - request: {}", request.getRequestURI());
+        String eventImage = eventService.getEventImage(uuid);
+        return ResponseEntity.ok().body(eventImage);
+    }
+
+
     @GetMapping("/{uuid}/invitations")
     @Operation(operationId = "getEventInvitations", summary = "get invitations by status", tags = {"event"}, responses = {
             @ApiResponse(responseCode = "200", description = "Ok"),

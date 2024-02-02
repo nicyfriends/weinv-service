@@ -23,7 +23,6 @@ import com.mainthreadlab.weinv.model.Event;
 import com.mainthreadlab.weinv.model.Invitation;
 import com.mainthreadlab.weinv.model.User;
 import com.mainthreadlab.weinv.model.enums.InvitationStatus;
-import com.mainthreadlab.weinv.model.enums.Language;
 import com.mainthreadlab.weinv.repository.EventRepository;
 import com.mainthreadlab.weinv.repository.InvitationRepository;
 import com.mainthreadlab.weinv.service.EmailService;
@@ -396,6 +395,19 @@ public class EventServiceImpl implements EventService {
     @Override
     public Event getByUuid(String uuid) {
         return eventRepository.findByUuidAndDateGreaterThanEqual(uuid, new Date());
+    }
+
+    @Override
+    public String getEventImage(String uuid) {
+        log.info("[get event image] - start: uuidEvent={}", uuid);
+
+        Event event = getByUuid(uuid);
+        if (event == null) {
+            log.error("[get event image] - event not found, uuid = {}", uuid);
+            throw new ResourceNotFoundException(EVENT_NOT_FOUND);
+        }
+        log.info("[get event image] - end");
+        return new String(event.getSpousesImage());
     }
 
 
