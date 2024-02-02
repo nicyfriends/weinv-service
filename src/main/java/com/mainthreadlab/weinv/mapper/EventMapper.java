@@ -67,7 +67,7 @@ public abstract class EventMapper {
             target.setInvitationsAvailable(event.getMaxInvitations() - numberOfSeatsTaken);
         }
         if (event.getSpousesImage() != null) {
-            target.setSpousesImage(Arrays.toString(event.getSpousesImage()));
+            target.setSpousesImage(new String(event.getSpousesImage()));
         }
         target.setPrice(event.getResponsible().getPrice());
         target.setExpired(isSourceDateBeforeTargetDate(event.getDate(), new Date()));
