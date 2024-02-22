@@ -192,7 +192,7 @@ public class EventServiceImpl implements EventService {
             }
             if (StringUtils.isNotBlank(searchKeyword)) {
                 String keyword = LIKE_KEYWORD_FORMAT.replace("keyword", Utils.toLowerCase(searchKeyword));
-                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get(GUEST_FIELD).get(USERNAME_FIELD), keyword),
+                predicates.add(criteriaBuilder.or(/*criteriaBuilder.like(root.get(GUEST_FIELD).get(USERNAME_FIELD), keyword),*/
                         criteriaBuilder.like(criteriaBuilder.lower(root.get(GUEST_FIELD).get(FIRSTNAME_FIELD)), keyword),
                         criteriaBuilder.like(criteriaBuilder.lower(root.get(GUEST_FIELD).get(LASTNAME_FIELD)), keyword)));
             }
